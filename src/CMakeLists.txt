@@ -1,9 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-PROJECT(piutests C)
+PROJECT(packitup C)
 
 SET (CMAKE_BUILD_TYPE Debug)
 
-ADD_EXECUTABLE(piutests main.c fdhandler/fdhandler.c errors/errors.c piu/piu.c)
-
-
+ADD_LIBRARY(piu STATIC fdhandler/fdhandler.c errors/errors.c piu/piu.c)
+ADD_LIBRARY(piushared SHARED fdhandler/fdhandler.c errors/errors.c piu/piu.c)
+ADD_EXECUTABLE(piuview fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/view.c)
+ADD_EXECUTABLE(devtest fdhandler/fdhandler.c errors/errors.c piu/piu.c main.c)

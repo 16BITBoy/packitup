@@ -159,3 +159,7 @@ int append_to_file(int fd, DATA *data)
 #endif
 }
 
+void free_data(DATA *data){
+    free(data->data);
+    free(data);
+}

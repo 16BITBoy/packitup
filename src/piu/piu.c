@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../fdhandler/fdhandler.h"
-#include "../errors/errors.h"
 #include "piu.h"
 
 /*FIXME: There is a ugly thing here. Read one more byte to avoid reallocating */
@@ -115,6 +113,11 @@ PIUFILE *open_piu_file(char *file){
     piu->header = get_piu_header(fd);
     if(piu->header == NULL)
         return NULL;
-    
+    close(fd);
     return piu;    
+}
+
+void unload_piu_file(PIUFILE *piu){
+    /*Unload file data*/
+    /*Unload header section*/
 }

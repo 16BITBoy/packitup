@@ -46,4 +46,5 @@ DATA *load_chk_file(int fd, unsigned long offset, unsigned long size);
 int save_file(char * path, DATA *data);
 int append_to_file(int fd, DATA *data);
 int file_open(char *path, int create);
+void free_data(DATA *data);
 #endif /* FDHANDLER_H_ */

@@ -1,5 +1,8 @@
 #ifndef _PIU_H_
 #define _PIU_H_
+
+#include "../errors/errors.h"
+#include "../fdhandler/fdhandler.h"
 #define FILEINFO_SIZE   264
 #define HEADER_MINSIZE  7
 
