@@ -73,7 +73,7 @@ DATA *load_file(char *path)
 #endif
 }
 
-/* Opens a file descriptor with read and write mode 
+/* Opens a file descriptor with read and write mode.
  * you can close it by using the syscall close()
 */
 int file_open(char *path, int create)

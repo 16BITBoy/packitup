@@ -105,19 +105,25 @@ HEADERINFO *get_piu_header(int fd){
     return header;
 }
 
+int get_piu_data(PIUFILE *piu, int fd){
+    int i;
+    for(i = 0; i < piu->header->
+
+
 PIUFILE *open_piu_file(char *file){
     PIUFILE *piu;
     piu = (PIUFILE *) malloc(sizeof(PIUFILE));
 
     int fd = file_open(file, FILE_MUST_EXIST);
     piu->header = get_piu_header(fd);
+    close(fd);
     if(piu->header == NULL)
         return NULL;
-    close(fd);
-    return piu;    
+    return piu;
 }
 
 void unload_piu_file(PIUFILE *piu){
-    /*Unload file data*/
-    /*Unload header section*/
+
+    /* Unload data section */
+    /* Unload header section */
 }

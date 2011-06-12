@@ -30,6 +30,7 @@ int is_piu_file(int fd);
 int get_flistsize(int fd);
 FILEINFO *get_fileinfolist(int fd, int numfiles);
 HEADERINFO *get_piu_header(int fd);
+int get_piu_data(PIUFILE *piu, int fd);
 PIUFILE *open_piu_file(char *file);
 
 #endif /* _PIU_H_ */
