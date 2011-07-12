@@ -19,12 +19,17 @@ int add_file(PIUFILE *piu, char *filepath){
         return 0;
     }
     
-    /* Add fileinfo to header */
-    piu->header->filelist.fileinfo = 
-    (FILEINFO *) realloc(piu->header->filelist.fileinfo, /* FIXME: If this sencence fails, we wont know it*/
-                         sizeof(FILEINFO) * (piu->header->filelist.filecount + 1)); 
+    /* Better create some defines for short naming */
+    #define FILEINFO    piu->header->filelist.fileinfo
+    #define FILECOUNT   piu->header->filelist.filecount
     
-    /*  Storing filename into the data structure. We take the name from the filepath parameter.
+    /* Add fileinfo to header */
+    fileinfo = 
+    (FILEINFO *) realloc(fileinfo, /* FIXME: If this sencence fails, we wont know it*/
+                         sizeof(FILEINFO) * (FILECOUNT + 1)); 
+    
+    /* Storing filename into the data structure. We take the name from
+     * the filepath parameter.
      * We need to allocate 256 bytes for store the filename.
      */
     piu->header->filelist.fileinfo[piu->header->filelist.filecount].filename = (char *) malloc(256);
@@ -37,12 +42,15 @@ int add_file(PIUFILE *piu, char *filepath){
                                      sizeof(DATA) * (piu->header->filelist.filecount + 1));
     piu->filedata[piu->header->filelist.filecount] = *filedata;
 
-
-
     return 1;
 }
 
-
+int write_piu(PIUFILE *piu, char *filepath){
+    DATA *writebuf;
+    writebuf = (DATA *) malloc(sizeof(DATA));
+    
+    return 0;
+}
 
 int main(int argc, char **argv){
     PIUFILE *piu = open_piu_file(argv[1]);
