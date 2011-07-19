@@ -40,7 +40,7 @@
 #endif
 
 /* Loads the entire file into memory and closes it */
-DATA *load_file(char *path)
+DATA *loadfile(char *path)
 {
 #ifdef __WINDOWS__
 	//Win32API
@@ -76,7 +76,7 @@ DATA *load_file(char *path)
 /* Opens a file descriptor with read and write mode.
  * you can close it by using the syscall close()
 */
-int file_open(char *path, int create)
+int fileopen(char *path, int create)
 {
     int fd;
     if(create){
@@ -91,7 +91,7 @@ int file_open(char *path, int create)
 /* Loads a chunk of data from a file. 
  * Loads 'size' bytes from 'offset'
 */
-DATA *load_chk_file(int fd, unsigned long offset, unsigned long size)
+DATA *loadchkfile(int fd, unsigned long offset, unsigned long size)
 {
 	int bytesread;
 	int filesize;
@@ -122,7 +122,7 @@ DATA *load_chk_file(int fd, unsigned long offset, unsigned long size)
 /* Saves 'data' in the file specified by 'path'.
  * Overwrites all the previous data in 'path'.
 */
-int save_file(char *path, DATA *data)
+int savetofile(char *path, DATA *data)
 {
 #ifdef __WINDOWS__
 	//Win32API
@@ -139,10 +139,23 @@ int save_file(char *path, DATA *data)
 	return byteswritten;
 #endif
 }
-
-/* Appends 'data' to the end of the file 
+/* Saves 'data' in the file which corresponds to 
+ * the file descriptor provided. 
 */
-int append_to_file(int fd, DATA *data)
+int savetofd(int fd, DATA *data)
+{
+#ifdef __WINDOWS__
+	//Win32API
+#else
+	int byteswritten;
+
+	byteswritten = write(fd, data->data, data->size);
+	return byteswritten;
+#endif
+}
+/* Appends 'data' to the end of the file.
+*/
+int appendtofd(int fd, DATA *data)
 {
 #ifdef __WINDOWS__
 	//Win32API
@@ -159,7 +172,7 @@ int append_to_file(int fd, DATA *data)
 #endif
 }
 
-void free_data(DATA *data){
+void freedata(DATA *data){
     free(data->data);
     free(data);
 }

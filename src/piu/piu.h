@@ -26,12 +26,12 @@ typedef struct{
     DATA *filedata;
 }PIUFILE;
 
-int is_piu_file(int fd);
-int get_flistsize(int fd);
-FILEINFO *get_fileinfolist(int fd, int numfiles);
-HEADERINFO *get_piu_header(int fd);
-int get_piu_data(PIUFILE *piu, int fd);
-PIUFILE *open_piu_file(char *file);
+int ispiufile(int fd);
+int getflistsize(int fd);
+FILEINFO *getfileinfolist(int fd, int numfiles);
+HEADERINFO *getpiu_header(int fd);
+int getpiudata(PIUFILE *piu, int fd);
+PIUFILE *openpiufile(char *file);
 
 #endif /* _PIU_H_ */
 

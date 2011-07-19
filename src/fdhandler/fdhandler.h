@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 //
 // FDHandler - A simple filesystem handler for load and save data
 // Copyright (C) 2011 Adrián Pérez Heredia (aperezhrd@gmail.com)
@@ -32,8 +32,8 @@
 #ifndef FDHANDLER_H_
 #define FDHANDLER_H_
 
-#define FILE_MUST_EXIST 0
-#define CREATE_FILE     1
+#define FMUSTEXIST 0
+#define FCREATE    1
 
 typedef struct
 {
@@ -41,10 +41,11 @@ typedef struct
 	int size;
 }DATA;
 
-DATA *load_file(char * path);
-DATA *load_chk_file(int fd, unsigned long offset, unsigned long size);
-int save_file(char * path, DATA *data);
-int append_to_file(int fd, DATA *data);
-int file_open(char *path, int create);
-void free_data(DATA *data);
+DATA *loadfile(char * path);
+DATA *loadchkfile(int fd, unsigned long offset, unsigned long size);
+int savetofile(char * path, DATA *data);
+int savetofd(int fd, DATA *data);
+int saveappend(int fd, DATA *data);
+int fileopen(char *path, int create);
+void freedata(DATA *data);
 #endif /* FDHANDLER_H_ */
