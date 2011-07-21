@@ -69,10 +69,25 @@ int writepiu(PIUFILE *piu, char *filepath){
         set_errorno(E_CANNOTWRITEFILE);
         return 0;
     }
+    
+     /* Better create some defines for short naming */
+    #define FINFO    piu->header->filelist.fileinfo
+    #define FCOUNT   piu->header->filelist.filecount
+    int i;
+    for(i = 0; i < FCOUNT; i++){
+        writebuf->data = FINFO[i].filename;
+        writebuf->size = 256; 
+        if(appendtofd(fd, writebuf) != 256){
+            set_errorno(E_CANNOTWRITEFILE);
+            return 0;
+        }
+    }
 
-    
-    
-    return 0;
+    /* TODO: Write file data */
+
+    freedata(writebuf);
+    close(fd);
+    return 1;
 }
 
 int main(int argc, char **argv){

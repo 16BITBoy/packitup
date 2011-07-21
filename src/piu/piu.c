@@ -5,9 +5,7 @@
 
 /*FIXME: There is a ugly thing here. Read one more byte to avoid reallocating */
 int ispiufile(int fd){
-
     DATA *dt = loadchkfile(fd, 0, 4);
-
     if(dt == NULL){
         set_errorno(E_CANNOTREADFILE);
         return 0;
@@ -15,12 +13,10 @@ int ispiufile(int fd){
         
     char piu[4];
     strcpy(piu, "PIU");
-    
     char *input = (char *) dt->data;
     input[3] = '\0';
     
     if(strcmp(piu, input) != 0){
-        
         set_errorno(E_PIUFILENOTVALID);
         return 0; // not PIU file
     }
@@ -30,7 +26,6 @@ int ispiufile(int fd){
 
 int getflistsize(int fd){
     DATA *buffer;
-
     buffer = loadchkfile(fd, 3, 4);
     if(buffer == NULL){
         set_errorno(E_PIUFILENOTVALID);
@@ -39,7 +34,6 @@ int getflistsize(int fd){
     
     int *flistsize;
     flistsize = (int *) buffer->data;
-
     return *flistsize;
 }
 
