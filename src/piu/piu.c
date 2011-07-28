@@ -43,7 +43,6 @@ FILEINFO *getfileinfolist(int fd, int numfiles){
     
     DATA *buffer;
     unsigned long *ulptr;
-
     unsigned long pos = 7;
 
     int i;
@@ -54,7 +53,9 @@ FILEINFO *getfileinfolist(int fd, int numfiles){
             return NULL;
         }
         
-        finfolist[i].filename = (char *) buffer->data;
+        char *ptr;
+        ptr = (char *) buffer->data;
+        strcpy(finfolist[i].filename, ptr);
 
         pos = pos + 256;
 

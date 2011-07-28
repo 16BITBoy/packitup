@@ -56,6 +56,11 @@ int writepiu(PIUFILE *piu, char *filepath){
     writebuf->size = 3;
     
     int fd = fileopen(filepath, FCREATE);
+    if(fd < 0){
+        set_errorno(E_CANNOTOPENFILE);
+        return 0;
+    }
+    
     if(savetofile(filepath, writebuf) != 3){
         set_errorno(E_CANNOTWRITEFILE);
         return 0;
@@ -65,7 +70,7 @@ int writepiu(PIUFILE *piu, char *filepath){
     writebuf->data = &hsize;
     writebuf->size = sizeof(int);
     
-    if(appendtofd(fd, hsize) != sizeof(int)){
+    if(appendtofd(fd, writebuf) != sizeof(int)){
         set_errorno(E_CANNOTWRITEFILE);
         return 0;
     }
@@ -91,19 +96,22 @@ int writepiu(PIUFILE *piu, char *filepath){
 }
 
 int main(int argc, char **argv){
-    PIUFILE *piu = openpiufile(argv[1]);
-    if(piu == NULL){
-        printf("\nFallo al abrir el fichero:\n");
-        printf("%s\n", piu_errmsg(piu_errno));
+    PIUFILE *piu;
+    piu = (PIUFILE *) malloc(sizeof(PIUFILE));
+    piu->header = (HEADERINFO *) malloc(sizeof(HEADERINFO));
+    piu->header->filelist.fileinfo = (FILEINFO *) malloc(sizeof(FILEINFO) * 2);
+    piu->header->filelist.fileinfo[0].filename = (char *) malloc(sizeof(char)*256);
+    piu->header->filelist.fileinfo[1].filename = (char *) malloc(sizeof(char)*256);
+    piu->header->filelist.fileinfo[0].size = 5;
+    strcpy(piu->header->filelist.fileinfo[0].filename, "Perez");
+    piu->header->filelist.fileinfo[1].size = 6;
+    strcpy(piu->header->filelist.fileinfo[1].filename, "Adrian");
+    piu->header->filelist.filecount = 2;
+
+    if(!writepiu(piu, "piufile")){
+        printf("\nEl fichero no se ha podido escribir correctamente.\n");
         return 1;
     }
-
-    if(!add_file(piu, argv[2])){
-        printf("\nFallo al añadir un nuevo fichero:\n");
-        printf("%s\n", piu_errmsg(piu_errno));
-        return 1;
-    }
-
-    printf("\nEl fichero se ha cargado con exito\n");
+    printf("\nEl fichero se ha escrito con exito\n");
     return 0; 
 }

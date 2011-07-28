@@ -9,6 +9,7 @@
 #define E_CANNOTREADFILE   -1
 #define E_CANNOTWRITEFILE  -2
 #define E_PIUFILENOTVALID  -3
+#define E_CANNOTOPENFILE   -4
 
 extern int piu_errno; 
 
