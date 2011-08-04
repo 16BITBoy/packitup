@@ -130,7 +130,7 @@ int savetofile(char *path, DATA *data)
 	int fd;
 	int byteswritten;
 
-	fd = open(path, O_WRONLY | O_CREAT);
+	fd = fileopen(path, FCREATE);
     if(fd < 0)
         return -1;
         

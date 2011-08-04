@@ -29,9 +29,11 @@ typedef struct{
 int ispiufile(int fd);
 int getflistsize(int fd);
 FILEINFO *getfileinfolist(int fd, int numfiles);
-HEADERINFO *getpiu_header(int fd);
+HEADERINFO *getpiuheader(int fd);
 int getpiudata(PIUFILE *piu, int fd);
 PIUFILE *openpiufile(char *file);
-
+PIUFILE *createpiufile();
+int writepiu(PIUFILE *piu, char *filepath);
+int addfile(PIUFILE *piu, char *filepath);
 #endif /* _PIU_H_ */
 

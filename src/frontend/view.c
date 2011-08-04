@@ -15,9 +15,9 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    int file = file_open(argv[1], 0);
+    int file = fileopen(argv[1], 0);
 
-    HEADERINFO *header = get_piu_header(file);
+    HEADERINFO *header = getpiuheader(file);
     
     if(header == NULL){
         printf("%s\n", piu_errmsg(piu_errno));
