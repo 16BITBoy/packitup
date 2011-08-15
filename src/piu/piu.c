@@ -115,7 +115,7 @@ PIUFILE *openpiufile(char *file){
     if(piu->header == NULL)
         return NULL;
     unsigned long datapos;
-    datapos = 3 + piu->header->flistsize; /*It starts pointing to the data start position. */
+    datapos = HEADER_MINSIZE + piu->header->flistsize; /*It starts pointing to the data start position. */
     
     piu->filedata = (DATA *) realloc(piu->filedata, sizeof(DATA)*(piu->header->filelist.filecount + 1));
     DATA *readbuffer;
@@ -126,8 +126,11 @@ PIUFILE *openpiufile(char *file){
             datapos = datapos + piu->header->filelist.fileinfo[i-1].size;
         /* Reading data section from piu file */    
         fd = fileopen(file, FMUSTEXIST);
-        readbuffer = loadchkfile(fd, datapos, piu->header->filelist.fileinfo[i].size); 
+        readbuffer = loadchkfile(fd, datapos, piu->header->filelist.fileinfo[i].size);
+        if(readbuffer == NULL)
+            return NULL; 
         piu->filedata[i].data = readbuffer->data;
+        piu->filedata[i].size = readbuffer->size;
     }
 
     return piu;

@@ -24,12 +24,18 @@ int main(int argc, char **argv){
         return piu_errno;
     }
 
-    printf(":::Printing retrieved information:::\n");
+    printf(":::     PackItUp File Viewer     :::\n");
     printf("------------------------------------\n");
     printf("Header size (bytes): %d\n\n", header->flistsize);
     printf("-------------Files------------------\n");
     printf("Filename\tSize\n");
     int i;
+
+    if(header->filelist.filecount == 0){
+        printf("\nThis file is empty\n\n");
+        return 0;
+    }
+
     for(i = 0; i < header->filelist.filecount; i++){
         printf("%s\t%ld\n",header->filelist.fileinfo[i].filename, header->filelist.fileinfo[i].size);
     }
