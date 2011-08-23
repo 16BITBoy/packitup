@@ -1,11 +1,135 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "piu.h"
 
 #define FCOUNT  piu->header->filelist.filecount
 #define FINFO   piu->header->filelist.fileinfo
 
+PIUSTRING *newpiustring(int len){
+    PIUSTRING *str = (PIUSTRING *)malloc(sizeof(PIUSTRING));
+    str->str = (char *)malloc(sizeof(char) * len);
+    str->len = len;
+    return str;
+}
+
+PIUSTRARR *newpiustrarr(){
+    PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    return strs;
+}
+
+PIUSTRARR *addpiustrarritem(PIUSTRARR *strs, PIUSTRING *str){
+    strs->items = (PIUSTRING *)
+                  realloc(strs->items, 
+                          sizeof(PIUSTRING) * (strs->nitems + 1));
+    strs->items[strs->nitems].str = str->str;
+    strs->items[strs->nitems].len = str->len;
+    strs->nitems++;
+    return strs;
+}
+
+PIUSTRING *concatpiustrarr(PIUSTRARR *strs){
+    PIUSTRING *str = NULL;
+    int finallen = 0;
+    int i;
+    for(i = 0; i < strs->nitems; i++){
+        finallen += strs->items[i].len + 1; /* Giving one more byte to the count
+                                               since we need to put a slash */
+    }
+    finallen--; /* We don't need a last slash */
+    str = newpiustring(finallen);
+    for(i = 0; i < strs->nitems; i++){
+        strcat(str->str, strs->items[i].str);
+        if(i < strs->nitems - 1)
+            strcat(str->str, "/");
+    }
+    return str;
+}
+int createpath(PIUSTRING *path){
+    PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    path = rmparentpathname(path);
+    strs = piustrsplit(path, '/');
+    int i;
+    for(i = 0; i < strs->nitems; i++){
+        if(mkdir(strs->items[i].str, S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP) != 0){
+            return 0;
+        }
+        if(chdir(strs->items[i].str) != 0){
+            return 0;
+        }
+    }
+    for(;i > 0; i--){
+        if(chdir("..") != 0){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+PIUSTRING *rmparentpathname(PIUSTRING *path){
+    int i;
+    if(path->str[0] == '.' && path->str[1] == '.' 
+                           && path->str[2] == '/')
+    {
+        for(i = 3; i < path->len; i++){
+            path->str[i-3] = path->str[i];
+        }
+        path->len -= 3;
+    }else if(path->str[0] == '/'){
+        for(i = 1; i < path->len; i++){
+            path->str[i-1] = path->str[i];
+        }
+        path->len -= 1;
+    }
+    return path; 
+}
+
+int substr(char *dest, char *src, int start, int end){
+    int j = 0;
+    int i = 0;
+    for(i = start; i < end; i++){
+        dest[j] = src[i];
+        j++;
+    }
+    return j;
+}
+
+PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
+    PIUSTRARR *strs = NULL;
+    int splits = 0;
+    int chksize = 0;
+    int lastmatch = 0;
+    int i;
+    strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    for(i = 0; i <= str->len; i++){ /* <= str->len may bring errors */
+        if(str->str[i] == sep){
+            strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
+            strs->nitems = splits + 1;
+            strs->items[splits].str = (char *)malloc(sizeof(char) * chksize);
+            strs->items[splits].len = chksize;
+
+            substr(strs->items[splits].str, str->str, lastmatch, i);
+
+            splits += 1;
+            chksize = 0;
+            lastmatch = i + 1;
+            if(str->str[i] == '\0')break;
+        }
+        else{
+            chksize += 1;
+        }
+    }
+    strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
+    strs->nitems = splits + 1;
+    strs->items[splits].str = (char *)malloc(sizeof(char) * chksize);
+    strs->items[splits].len = chksize;
+    substr(strs->items[splits].str, str->str, lastmatch, i);
+
+    return strs;
+}
 /*FIXME: There is a ugly thing here. Read one more byte to avoid reallocating */
 int ispiufile(int fd){
     DATA *dt = loadchkfile(fd, 0, 4);

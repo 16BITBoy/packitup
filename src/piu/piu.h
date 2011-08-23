@@ -7,6 +7,16 @@
 #define HEADER_MINSIZE  7
 
 typedef struct{
+    char *str;
+    int len;
+}PIUSTRING;
+
+typedef struct{
+    PIUSTRING *items;
+    int nitems;
+}PIUSTRARR;
+
+typedef struct{
     char *filename;
     unsigned long int size;
 }FILEINFO;
@@ -25,7 +35,14 @@ typedef struct{
     HEADERINFO *header;
     DATA *filedata;
 }PIUFILE;
-
+PIUSTRING *concatpiustrarr(PIUSTRARR *strs);
+PIUSTRARR *piustrsplit(PIUSTRING *str, char sep);
+PIUSTRING *rmparentpathname(PIUSTRING *path);
+int createpath(PIUSTRING *path);
+PIUSTRING *newpiustring(int len);
+PIUSTRARR *newpiustrarr();
+PIUSTRARR *addpiustrarritem(PIUSTRARR *strs, PIUSTRING *str);
+int substr(char *dest, char *src, int start, int end);
 int ispiufile(int fd);
 int getflistsize(int fd);
 FILEINFO *getfileinfolist(int fd, int numfiles);
