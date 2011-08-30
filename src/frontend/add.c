@@ -19,6 +19,7 @@ int main(int argc, char **argv){
     for(i = 2; i < argc; i++){
         prog = (100 / (argc - 1)) * (i - 1);
         printf("\n%f ...\n", prog);
+	argv[i] = rmparentpathname(argv[i]);
         if(!addfile(piu, argv[i])){
             set_errorno(E_CANNOTREADFILE);
             printf("\n%s\n",piu_errmsg(piu_errno));
@@ -35,4 +36,3 @@ int main(int argc, char **argv){
     
     return 0;
 }
-
