@@ -10,7 +10,7 @@ int main(int argc, char **argv){
     /* Load PIU file and the file to be added */
     PIUFILE *piu = openpiufile(argv[1]);
     if(piu == NULL){
-        exit(2);
+        piu = createpiufile();
     }
     
     int i;
@@ -19,11 +19,10 @@ int main(int argc, char **argv){
     for(i = 2; i < argc; i++){
         prog = (100 / (argc - 1)) * (i - 1);
         printf("\n%f ...\n", prog);
-	argv[i] = rmparentpathname(argv[i]);
         if(!addfile(piu, argv[i])){
             set_errorno(E_CANNOTREADFILE);
             printf("\n%s\n",piu_errmsg(piu_errno));
-            exit(3);
+            exit(2);
         }
     }
     printf("\n100\% ...\n"); 
@@ -31,7 +30,7 @@ int main(int argc, char **argv){
     if(!writepiu(piu, argv[1])){
         set_errorno(E_CANNOTWRITEFILE);
         printf("\n%s\n",piu_errmsg(piu_errno));
-        exit(4);
+        exit(3);
     }
     
     return 0;

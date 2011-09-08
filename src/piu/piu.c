@@ -70,23 +70,28 @@ int createpath(PIUSTRING *path){
 }
 
 PIUSTRING *rmparentpathname(PIUSTRING *path){
+    int clean = 0;
     int i;
-    if(path->str[0] == '.' && path->str[1] == '.' 
-                           && path->str[2] == '/')
-    {
-        for(i = 3; i < path->len; i++){
-            path->str[i-3] = path->str[i];
+    
+    while(!clean){
+        if(path->str[0] == '.' && path->str[1] == '.' 
+                               && path->str[2] == '/')
+        {
+            for(i = 3; i < path->len; i++){
+                path->str[i-3] = path->str[i];
+            }
+            path->len -= 3;
+        }else if(path->str[0] == '/'){
+            for(i = 1; i < path->len; i++){
+                path->str[i-1] = path->str[i];
+            }
+            path->len -= 1;
+        }else{
+            clean = 1;
         }
-        path->len -= 3;
-    }else if(path->str[0] == '/'){
-        for(i = 1; i < path->len; i++){
-            path->str[i-1] = path->str[i];
-        }
-        path->len -= 1;
     }
     return path; 
 }
-
 int substr(char *dest, char *src, int start, int end){
     int j = 0;
     int i = 0;
@@ -360,7 +365,10 @@ int addfile(PIUFILE *piu, char *filepath){
      * We need to allocate 256 bytes for store the filename.
      */
     FINFO[FCOUNT].filename = (char *) malloc(256);
-    strcpy(FINFO[FCOUNT].filename, filepath);
+    PIUSTRING *filename = newpiustring(256);
+    strcpy(filename->str, filepath);
+    rmparentpathname(filename);
+    strcpy(FINFO[FCOUNT].filename, filename->str);
     
     FINFO[FCOUNT].size = filedata->size;
 
