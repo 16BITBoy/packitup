@@ -12,6 +12,7 @@
 PIUSTRING *newpiustring(int len){
     PIUSTRING *str = (PIUSTRING *)malloc(sizeof(PIUSTRING));
     str->str = (char *)malloc(sizeof(char) * len);
+    memset(str->str, 0, len);
     str->len = len;
     return str;
 }
