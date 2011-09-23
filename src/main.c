@@ -74,11 +74,52 @@ int listallfiles(char *path, PIUSTRARR *filelist, PIUSTRARR *buf){
     return 1;
 }
 
+int listallfiles2(char *path, PIUSTRARR *filelist){
+    DIR *dirp;
+    struct stat statbuf;
+    struct dirent *entry;
+    PIUSTRING *fname = NULL;
+    PIUSTRING *cwd = NULL;
+
+    char curitempath[PATH_MAX];
+    if((dirp = opendir(path)) == NULL){
+        fprintf(stderr, "cannot open directory: %s\n", path);
+        return 0;
+    }
+    
+    while((entry = readdir(dirp)) != NULL){
+        strcpy(curitempath, path);
+        strcat(curitempath, "/");
+        strcat(curitempath, entry->d_name);
+        if(lstat(curitempath, &statbuf) == -1){
+            char errtitle[PATH_MAX];
+            strcpy(errtitle, "Error stating ");
+            strcat(errtitle, entry->d_name);
+            perror(errtitle);
+            printf("\nCurrent path is: %s\n", path);
+            return 0;
+        }
+        if(S_ISDIR(statbuf.st_mode)){
+            if(strcmp(entry->d_name, ".") != 0 &&
+               strcmp(entry->d_name, "..") != 0)
+            {
+                listallfiles2(curitempath, filelist);
+            }    
+        }
+        if(S_ISREG(statbuf.st_mode)){
+            fname = newpiustring(PATH_MAX);
+            strcpy(fname->str, curitempath);
+            addpiustrarritem(filelist, fname);
+        }
+    }
+    return 1;
+}
+
+
 int main(int argc, char **argv){
     char *path = argv[1];
     PIUSTRARR *filelist = newpiustrarr();
-    PIUSTRARR *pathbuf =newpiustrarr();
-    listallfiles(path, filelist, pathbuf);
+    listallfiles2(path, filelist);
 
     int i;
     for(i = 0; i < filelist->nitems; i++){
