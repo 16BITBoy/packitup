@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../piu/piu.h"
 
 
 void show_help(){
-    printf("\n\nUsage: piuview <filename>\n\n");
+    printf("\nUsage: piuview <filename>\n\n");
 }
 
 int main(int argc, char **argv){
@@ -13,6 +14,11 @@ int main(int argc, char **argv){
     if(argc < 2){
         show_help();
         return 1;
+    }
+
+    if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
+        printf("\npiuview - Pack It Up file viewer\nver:0.1.2\n\n");
+        return 0;
     }
 
     int file = fileopen(argv[1], 0);

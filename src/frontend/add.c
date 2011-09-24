@@ -51,11 +51,17 @@ int listallfiles(char *path, PIUSTRARR *filelist){
 
 
 int main(int argc, char **argv){
+    if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
+        printf("piuadd - Pack It Up packager\nver:0.1.8\n\n");
+        return 0;
+    }
+    
     PIUSTRARR *filelist = newpiustrarr();
     if(argc < 3){
-        printf("\nUsage: piuadd PIUFILE FILE...");
+        printf("Usage: piuadd PIUFILE FILE...\n\n");
         exit(1);
     }
+
     /* Load PIU file and the file to be added */
     PIUFILE *piu = openpiufile(argv[1]);
     if(piu == NULL){
