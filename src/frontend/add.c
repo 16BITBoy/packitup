@@ -22,7 +22,7 @@ int listallfiles(char *path, PIUSTRARR *filelist){
     
     while((entry = readdir(dirp)) != NULL){
         strcpy(curitempath, path);
-        strcat(curitempath, "/");
+        if(path[strlen(path)-1] != '/')strcat(curitempath, "/");
         strcat(curitempath, entry->d_name);
         if(lstat(curitempath, &statbuf) == -1){
             char errtitle[PATH_MAX];
@@ -48,19 +48,34 @@ int listallfiles(char *path, PIUSTRARR *filelist){
     return 1;
 }
 
-
+void showhelp(const char *msg){
+    if(msg != NULL)printf("Error : %s\n", msg);
+    printf("Usage : piuadd PIUFILE FILE...\n\n");
+}
 
 int main(int argc, char **argv){
+    if(argc < 2){
+       showhelp("Numero de argumentos incorrecto...");
+       exit(1);
+    }
+
     if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
         printf("piuadd - Pack It Up packager\nver:0.1.8\n\n");
         return 0;
     }
+
+    if(strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0){
+        showhelp(NULL);
+        exit(0);
+    }
     
-    PIUSTRARR *filelist = newpiustrarr();
     if(argc < 3){
-        printf("Usage: piuadd PIUFILE FILE...\n\n");
+        showhelp("Se necesita un parametro mas.");
         exit(1);
     }
+
+    PIUSTRARR *filelist = newpiustrarr();
+    
 
     /* Load PIU file and the file to be added */
     PIUFILE *piu = openpiufile(argv[1]);
@@ -69,10 +84,15 @@ int main(int argc, char **argv){
     }
     
     /* Get all files from directories if there is one as argument */
-    int i;
+    unsigned long i;
     for(i = 2; i < argc; i++){
         struct stat statbuf;
-        lstat(argv[i], &statbuf);
+        if(lstat(argv[i], &statbuf) == -1){
+            char msg[256];
+            snprintf(msg, 256, "Error opening <<%s>> ", argv[i]);
+            perror(msg);
+            exit(1);
+        }
         if(S_ISDIR(statbuf.st_mode)){
             listallfiles(argv[i], filelist);
         }
