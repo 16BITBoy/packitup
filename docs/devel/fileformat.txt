@@ -1,0 +1,11 @@
+----HEADER----
+FILE FORMAT NAME - [3 BYTES]
+FILE LIST SIZE - [4 BYTES]
+FILE LIST - {
+    ----FILE LIST FORMAT CHUNK----
+    FILE NAME - [256 BYTES]
+    FILE SIZE - [8 BYTES]
+    ------------------------------
+}
+--------------
+FILE DATA SPACE...
