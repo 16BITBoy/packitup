@@ -19,6 +19,8 @@ PIUSTRING *newpiustring(int len){
 
 PIUSTRARR *newpiustrarr(){
     PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    strs->items = NULL;
+    strs->nitems = 0;
     return strs;
 }
 
