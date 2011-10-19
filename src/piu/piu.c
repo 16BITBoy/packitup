@@ -263,6 +263,7 @@ PIUFILE *openpiufile(char *file){
             return NULL; 
         piu->filedata[i].data = readbuffer->data;
         piu->filedata[i].size = readbuffer->size;
+        close(fd);
     }
 
     return piu;

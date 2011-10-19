@@ -11,7 +11,7 @@ int main(int argc, char **argv){
     if(argc < 2){
         printf("error: Not enough parameters.\n");
         printf("usage: piuextract [OPTION]\n       piuextract PIUFILE DESTINO\n\n");
-        return 0;
+        return 1;
     }
     if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
         printf("piuextract - Pack It Up file extractor\nver:0.1.2\n\n");
@@ -21,11 +21,11 @@ int main(int argc, char **argv){
         printf("usage: piuextract [OPTION]\n       piuextract PIUFILE DESTINO\n\n");
         return 0;
     }
-
     PIUFILE *piu = openpiufile(argv[1]);
     if(piu == NULL){
         printf("\nerror: Cannot read or open piufile\n\n");
-        exit(1);
+        perror("opening file");
+        exit(2);
     }
 
     unsigned long i;
