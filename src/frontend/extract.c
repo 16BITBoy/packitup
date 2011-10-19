@@ -8,13 +8,17 @@
 #include "../piu/piu.h"
 
 int main(int argc, char **argv){
+    if(argc < 2){
+        printf("error: Not enough parameters.\n");
+        printf("usage: piuextract [OPTION]\n       piuextract PIUFILE DESTINO\n\n");
+        return 0;
+    }
     if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
         printf("piuextract - Pack It Up file extractor\nver:0.1.2\n\n");
         return 0;
     }
-    
-    if(argc < 2){
-        printf("usage: piuextract [OPTION]\npiuextract PIUFILE DESTINO\n\n");
+    if(strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0){
+        printf("usage: piuextract [OPTION]\n       piuextract PIUFILE DESTINO\n\n");
         return 0;
     }
 
