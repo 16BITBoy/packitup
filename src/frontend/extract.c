@@ -23,8 +23,12 @@ int main(int argc, char **argv){
     }
 
     PIUFILE *piu = openpiufile(argv[1]);
+    if(piu == NULL){
+        printf("\nerror: Cannot read or open piufile\n\n");
+        exit(1);
+    }
 
-    int i;
+    unsigned long i;
     PIUSTRING *path = NULL;
     PIUSTRARR *dirs = NULL;
     struct stat st;
