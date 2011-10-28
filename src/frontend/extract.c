@@ -36,12 +36,13 @@ int main(int argc, char **argv){
         path = newpiustring(strlen(piu->header->filelist.fileinfo[i].filename));
         strcpy(path->str, piu->header->filelist.fileinfo[i].filename);
         dirs = piustrsplit(path, '/');
-        dirs->nitems--;
+        dirs->nitems--; /* Exclude last item, so we get the parent directory of the file */
         path = concatpiustrarr(dirs);
         if(stat(path->str, &st) < 0 && errno == ENOENT){
             if(!createpath(path)){
                 set_errorno(E_CANNOTWRITEFILE);
-                /*printf("\n\n%s\n", piu_errmsg(piu_errno));*/
+                perror("error creando ruta");
+                printf("Ruta: %s\n", path->str);
                 exit(1);
             }
         }
@@ -49,6 +50,9 @@ int main(int argc, char **argv){
                       &piu->filedata[i]) != piu->header->filelist.fileinfo[i].size)
         {
             set_errorno(E_CANNOTWRITEFILE);
+            perror("Error al escribir el fichero a disco");
+            printf("Se intentó copiar el fichero en la siguiente ubicación: %s\n",
+                    piu->header->filelist.fileinfo[i].filename);
             /*printf("\n\n%s\n",piu_errmsg(piu_errno));*/
             printf("No se pudo extraer la totalidad de los ficheros\n");
             exit(1);

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <errno.h>
 #include "piu.h"
 
 #define FCOUNT  piu->header->filelist.filecount
@@ -55,10 +56,15 @@ int createpath(PIUSTRING *path){
     PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
     path = rmparentpathname(path);
     strs = piustrsplit(path, '/');
+    struct stat st;
     int i;
     for(i = 0; i < strs->nitems; i++){
-        if(mkdir(strs->items[i].str, S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP) != 0){
-            return 0;
+        if(lstat(strs->items[i].str, &st) == -1 && errno == ENOENT){
+            if(mkdir(strs->items[i].str, S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP) != 0){
+                perror("error creando directorio");
+                printf("Directorio: %s\n", strs->items[i].str);
+                return 0;
+            }
         }
         if(chdir(strs->items[i].str) != 0){
             return 0;
