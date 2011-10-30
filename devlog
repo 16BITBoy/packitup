@@ -1,0 +1,7 @@
+El fallo que intento solucionar es el que surge cuando he intentado extraer el fichero "micodigo"; creado con la última versión de piuadd, el cual durante el proceso se para diciendo que no se puede extraer uno de los ficheros ya que la ruta no existe.
+
+Efectivamente el directorio "Quick Currency Converter" no existe como tal, sino que ha sido creado por piuextract como "Quick Currency Converter!". 
+
+He comprobado la cabecera del fichero "micodigo" y en la linea que figuraba el fichero que se quería copiar (AndroidManifest.xml) el directorio se llama "Quick Currency Converter". 
+
+Debo encontrár el motivo del por qué el programa crea ese directorio con un simbolo de exclamación al final de su nombre. Cabe añadir que no lo hace con otros directorios.
