@@ -117,12 +117,19 @@ PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
     int chksize = 0;
     int lastmatch = 0;
     int i;
-    strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    /*strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));*/
+    strs = newpiustrarr();
     for(i = 0; i <= str->len; i++){ /* <= str->len may bring errors */
         if(str->str[i] == sep){
+            /*this is just for debug fixpiuextract1*/
+            if(splits == 1){
+                continue;
+            }
             strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
             strs->nitems = splits + 1;
+            strs->items[splits].str = NULL;
             strs->items[splits].str = (char *)malloc(sizeof(char) * chksize);
+            memset(strs->items[splits].str, 0, chksize);
             strs->items[splits].len = chksize;
 
             substr(strs->items[splits].str, str->str, lastmatch, i);

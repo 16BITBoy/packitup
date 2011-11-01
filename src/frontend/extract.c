@@ -33,6 +33,10 @@ int main(int argc, char **argv){
     PIUSTRARR *dirs = NULL;
     struct stat st;
     for(i = 0; i < piu->header->filelist.filecount; i++){
+        /*this is just for debug fixpiuextract1*/
+        if(i == 44){
+            printf("\'\'Aqui comienza el error\'\'\n");
+        }
         path = newpiustring(strlen(piu->header->filelist.fileinfo[i].filename));
         strcpy(path->str, piu->header->filelist.fileinfo[i].filename);
         dirs = piustrsplit(path, '/');

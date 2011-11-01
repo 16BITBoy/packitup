@@ -1,3 +1,6 @@
+2011-10-30 19:03
+Nombre de directorio erroneo:
+
 El fallo que intento solucionar es el que surge cuando he intentado extraer el fichero "micodigo"; creado con la última versión de piuadd, el cual durante el proceso se para diciendo que no se puede extraer uno de los ficheros ya que la ruta no existe.
 
 Efectivamente el directorio "Quick Currency Converter" no existe como tal, sino que ha sido creado por piuextract como "Quick Currency Converter!". 
@@ -5,3 +8,16 @@ Efectivamente el directorio "Quick Currency Converter" no existe como tal, sino 
 He comprobado la cabecera del fichero "micodigo" y en la linea que figuraba el fichero que se quería copiar (AndroidManifest.xml) el directorio se llama "Quick Currency Converter". 
 
 Debo encontrár el motivo del por qué el programa crea ese directorio con un simbolo de exclamación al final de su nombre. Cabe añadir que no lo hace con otros directorios.
+
+2011-11-1 09:04
+
+He localizado la función mediante depuración, que causa que piuextract nombre al directorio "Quick Currency Converter" con un signo de exclamación al final de este. Ahora toca averiguar de que se trata.
+
+2011-11-1 09:46
+
+Parece ser que no es a causa de mala inicialización de los arrays de piustring. Se han inicializado a cero y NULL cuando se ha creido oportuno pero continúa fallando. Puede que convenga reescribir esa función en vez de buscar el fallo.
+
+2011-11-1 10:49
+
+El fallo se encuentra en la función substr(). Por alguna razón que aun desconozco, al copiar el último caracter de la cadena, copia dos caracteres: la última 'r' y el simbolo de exclamación. ¿Puede tratarse de falta de soporte unicode?
+ 
