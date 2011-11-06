@@ -38,12 +38,12 @@
 typedef struct
 {
 	void *data;
-	int size;
+    unsigned long size;
 }DATA;
 
 DATA *loadfile(char * path);
 DATA *loadchkfile(int fd, unsigned long offset, unsigned long size);
-int savetofile(char * path, DATA *data);
+long savetofile(char * path, DATA *data);
 int savetofd(int fd, DATA *data);
 int saveappend(int fd, DATA *data);
 int fileopen(char *path, int create);

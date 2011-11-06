@@ -106,8 +106,9 @@ int substr(char *dest, char *src, int start, int end){
     int i = 0;
     for(i = start; i < end; i++){
         dest[j] = src[i];
-        j++;
+        ++j;
     }
+    dest[end+1] = '\0';
     return j;
 }
 
@@ -122,13 +123,10 @@ PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
     for(i = 0; i <= str->len; i++){ /* <= str->len may bring errors */
         if(str->str[i] == sep){
             /*this is just for debug fixpiuextract1*/
-            if(splits == 1){
-                continue;
-            }
             strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
             strs->nitems = splits + 1;
             strs->items[splits].str = NULL;
-            strs->items[splits].str = (char *)malloc(sizeof(char) * chksize);
+            strs->items[splits].str = (char *)malloc(sizeof(char) * (chksize + 1));
             memset(strs->items[splits].str, 0, chksize);
             strs->items[splits].len = chksize;
 

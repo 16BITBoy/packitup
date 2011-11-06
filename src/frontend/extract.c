@@ -33,10 +33,6 @@ int main(int argc, char **argv){
     PIUSTRARR *dirs = NULL;
     struct stat st;
     for(i = 0; i < piu->header->filelist.filecount; i++){
-        /*this is just for debug fixpiuextract1*/
-        if(i == 44){
-            printf("\'\'Aqui comienza el error\'\'\n");
-        }
         path = newpiustring(strlen(piu->header->filelist.fileinfo[i].filename));
         strcpy(path->str, piu->header->filelist.fileinfo[i].filename);
         dirs = piustrsplit(path, '/');
@@ -50,14 +46,9 @@ int main(int argc, char **argv){
                 exit(1);
             }
         }
-        if(savetofile(piu->header->filelist.fileinfo[i].filename,
-                      &piu->filedata[i]) != piu->header->filelist.fileinfo[i].size)
-        {
-            set_errorno(E_CANNOTWRITEFILE);
-            perror("Error al escribir el fichero a disco");
-            printf("Se intentó copiar el fichero en la siguiente ubicación: %s\n",
-                    piu->header->filelist.fileinfo[i].filename);
-            /*printf("\n\n%s\n",piu_errmsg(piu_errno));*/
+        long bytescopied = savetofile(piu->header->filelist.fileinfo[i].filename,
+                                               &piu->filedata[i]);
+        if(bytescopied != piu->header->filelist.fileinfo[i].size){
             printf("No se pudo extraer la totalidad de los ficheros\n");
             exit(1);
         }

@@ -37,6 +37,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <stdio.h>
 #endif
 
 /* Loads the entire file into memory and closes it */
@@ -122,19 +124,26 @@ DATA *loadchkfile(int fd, unsigned long offset, unsigned long size)
 /* Saves 'data' in the file specified by 'path'.
  * Overwrites all the previous data in 'path'.
 */
-int savetofile(char *path, DATA *data)
+long savetofile(char *path, DATA *data)
 {
 #ifdef __WINDOWS__
 	//Win32API
 #else
 	int fd;
-	int byteswritten;
+	long byteswritten;
 
 	fd = fileopen(path, FCREATE);
-    if(fd < 0)
+    if(fd < 0){
+        printf("No se pudo crear un nuevo descriptor de fichero\n");
+        printf("Error al abrir o crear un fichero en: %s\n", path);
+        perror("file descriptor");
         return -1;
-        
+    }
 	byteswritten = write(fd, data->data, data->size);
+    if(byteswritten == -1){
+        perror("Error al escribir el fichero a disco");
+        printf("Se intentó copiar el fichero en la siguiente ubicación: %s\n", path);
+    }
     close(fd);
 	return byteswritten;
 #endif
