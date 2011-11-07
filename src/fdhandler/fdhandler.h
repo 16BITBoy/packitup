@@ -41,7 +41,7 @@ typedef struct
     unsigned long size;
 }DATA;
 
-DATA *loadfile(char * path);
+DATA *loadfile(char *path);
 DATA *loadchkfile(int fd, unsigned long offset, unsigned long size);
 long savetofile(char * path, DATA *data);
 int savetofd(int fd, DATA *data);

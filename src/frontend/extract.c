@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -8,6 +9,8 @@
 #include "../piu/piu.h"
 
 int main(int argc, char **argv){
+    setlocale(LC_ALL, "");
+    
     if(argc < 2){
         printf("error: Not enough parameters.\n");
         printf("usage: piuextract [OPTION]\n       piuextract PIUFILE DESTINO\n\n");
