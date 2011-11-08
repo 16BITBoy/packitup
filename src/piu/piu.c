@@ -11,8 +11,10 @@
 #define FINFO   piu->header->filelist.fileinfo
 
 PIUSTRING *newpiustring(int len){
-    PIUSTRING *str = (PIUSTRING *)malloc(sizeof(PIUSTRING));
-    str->str = (char *)malloc(sizeof(char) * len);
+    PIUSTRING *str = NULL; /*Just to shut up valgrind*/
+    str = (PIUSTRING *)malloc(sizeof(PIUSTRING));
+    str->str = NULL;
+    str->str = (char *)malloc(sizeof(char) * (len+1));
     memset(str->str, 0, len);
     str->len = len;
     return str;
@@ -53,7 +55,8 @@ PIUSTRING *concatpiustrarr(PIUSTRARR *strs){
     return str;
 }
 int createpath(PIUSTRING *path){
-    PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
+    /*PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));*/
+    PIUSTRARR *strs = newpiustrarr();
     path = rmparentpathname(path);
     strs = piustrsplit(path, '/');
     struct stat st;
@@ -108,7 +111,7 @@ int substr(char *dest, char *src, int start, int end){
         dest[j] = src[i];
         ++j;
     }
-    dest[end+1] = '\0';
+    dest[j] = '\0';
     return j;
 }
 
@@ -122,7 +125,6 @@ PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
     strs = newpiustrarr();
     for(i = 0; i <= str->len; i++){ /* <= str->len may bring errors */
         if(str->str[i] == sep){
-            /*this is just for debug fixpiuextract1*/
             strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
             strs->nitems = splits + 1;
             strs->items[splits].str = NULL;
@@ -143,7 +145,7 @@ PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
     }
     strs->items = (PIUSTRING *)realloc(strs->items, sizeof(PIUSTRING) * (splits + 1));
     strs->nitems = splits + 1;
-    strs->items[splits].str = (char *)malloc(sizeof(char) * chksize);
+    strs->items[splits].str = (char *)malloc(sizeof(char) * (chksize + 1));
     strs->items[splits].len = chksize;
     substr(strs->items[splits].str, str->str, lastmatch, i);
 
@@ -251,6 +253,8 @@ HEADERINFO *getpiuheader(int fd){
 PIUFILE *openpiufile(char *file){
     PIUFILE *piu;
     piu = (PIUFILE *) malloc(sizeof(PIUFILE));
+    piu->header = NULL;
+    piu->filedata = NULL;
 
     int fd = fileopen(file, FMUSTEXIST);
     piu->header = getpiuheader(fd);

@@ -37,8 +37,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <stdio.h>
+#include <errno.h>
 #endif
 
 /* Loads the entire file into memory and closes it */
@@ -97,7 +97,7 @@ DATA *loadchkfile(int fd, unsigned long offset, unsigned long size)
 {
 	int bytesread;
 	int filesize;
-	DATA *data;
+	DATA *data = NULL;
 	void *dataptr = NULL;
 
     /* Extra checking, but good ;) */    
@@ -136,7 +136,7 @@ long savetofile(char *path, DATA *data)
     if(fd < 0){
         printf("No se pudo crear un nuevo descriptor de fichero\n");
         printf("Error al abrir o crear un fichero en: %s\n", path);
-        perror("file descriptor");
+        /*perror(NULL);*/
         return -1;
     }
 	byteswritten = write(fd, data->data, data->size);
@@ -180,7 +180,8 @@ int appendtofd(int fd, DATA *data)
 	return byteswritten;
 #endif
 }
-
+/* Do not use this function if you are using a DATA* structure as a buffer
+ * with data member pointing to a stack address. */
 void freedata(DATA *data){
     free(data->data);
     free(data);

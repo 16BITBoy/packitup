@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
-#include <errno.h>
+/*#include <locale.h>*/
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
 #include "../piu/piu.h"
+#include <errno.h>
 
 int main(int argc, char **argv){
-    setlocale(LC_ALL, "");
+    /*setlocale(LC_ALL, "");*/
     
     if(argc < 2){
         printf("error: Not enough parameters.\n");
