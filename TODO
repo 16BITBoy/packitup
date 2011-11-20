@@ -1,0 +1,4 @@
+- Implement file deletion
+- Fix bug in progress counter in piuadd.
+- Implement progress counter in piuextract
+- Rename concatpiustrarr to buildpathname
