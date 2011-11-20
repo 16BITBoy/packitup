@@ -113,10 +113,11 @@ int main(int argc, char **argv){
             
     }
     /* Adding files */
-    float prog = 0;
+    double prog = 0;
+    double nfiles = filelist->nitems;
     printf("\nAdding new files...\n");
     for(i = 0; i < filelist->nitems; i++){
-        prog = (100 / filelist->nitems) * i;
+        prog = (100 / nfiles) * i;
         printf("\n%f ...\n", prog);
         if(!addfile(piu, filelist->items[i].str)){
             set_errorno(E_CANNOTREADFILE);
