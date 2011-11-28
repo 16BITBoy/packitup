@@ -37,7 +37,7 @@
 
 typedef struct
 {
-	void *data;
+    void *data;
     unsigned long size;
 }DATA;
 
