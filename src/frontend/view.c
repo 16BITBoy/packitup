@@ -15,7 +15,7 @@ int main(int argc, char **argv){
         return 1;
     }
     if(strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0){
-        printf("\npiuview - Pack It Up file viewer\nver:0.1.2\n\n");
+        printf("\npiuview - Pack It Up file viewer\nver:0.1.3\n\n");
         return 0;
     }
     int file = fileopen(argv[1], 0);
@@ -29,7 +29,7 @@ int main(int argc, char **argv){
     printf("------------------------------------\n");
     printf("Header size (bytes): %d\n\n", header->flistsize);
     printf("-------------Files------------------\n");
-    printf("Filename\tSize\n");
+    printf("Id\t\tFilename\t\tSize\n");
     
     if(header->filelist.filecount == 0){
         printf("\nThis file is empty\n\n");
@@ -37,7 +37,9 @@ int main(int argc, char **argv){
     }
     int i;
     for(i = 0; i < header->filelist.filecount; i++){
-        printf("%s\t%ld\n",header->filelist.fileinfo[i].filename, header->filelist.fileinfo[i].size);
+        printf("%d\t%s\t\t%ld\n", i,
+                                  header->filelist.fileinfo[i].filename, 
+                                  header->filelist.fileinfo[i].size);
     }
    
     return 0;
