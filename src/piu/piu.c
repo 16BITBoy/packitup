@@ -400,6 +400,29 @@ int addfile(PIUFILE *piu, char *filepath){
     return 1;
 }
 
+int deletefile(PIUFILE *piu, unsigned long filenum){
+#define FCOUNT piu->header->filelist.filecount
+#define FINFO piu->header->filelist.fileinfo
+
+    if(FCOUNT == 0)return 0;
+
+    unsigned long i;
+    for(i = filenum; i < FCOUNT - 1; i++){
+        FINFO[i] = FINFO[i+1];    
+        piu->filedata[i] = piu->filedata[i+1];
+    }
+    FINFO =
+    (FILEINFO *) realloc(FINFO,
+                         sizeof(FILEINFO) * (FCOUNT - 1));
+    piu->filedata = (DATA *) realloc(piu->filedata, 
+                                         sizeof(DATA) * (FCOUNT -1));
+    piu->header->flistsize = piu->header->flistsize - FILEINFO_SIZE;
+    FCOUNT = FCOUNT - 1;
+    return 1;
+}
+
+
+
 void unloadpiufile(PIUFILE *piu){
 
     /* Unload data section */

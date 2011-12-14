@@ -52,5 +52,6 @@ PIUFILE *openpiufile(char *file);
 PIUFILE *createpiufile();
 int writepiu(PIUFILE *piu, char *filepath);
 int addfile(PIUFILE *piu, char *filepath);
+int deletefile(PIUFILE *piu, unsigned long filenum);
 #endif /* _PIU_H_ */
 
