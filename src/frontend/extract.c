@@ -40,13 +40,15 @@ int main(int argc, char **argv){
         strcpy(path->str, piu->header->filelist.fileinfo[i].filename);
         dirs = piustrsplit(path, '/');
         dirs->nitems--; /* Exclude last item, so we get the parent directory of the file */
-        path = concatpiustrarr(dirs);
-        if(stat(path->str, &st) < 0 && errno == ENOENT){
-            if(!createpath(path)){
-                set_errorno(E_CANNOTWRITEFILE);
-                perror("error creando ruta");
-                printf("Ruta: %s\n", path->str);
-                exit(1);
+        if(dirs->nitems > 0){ /* TODO: Refactor needed */
+            path = concatpiustrarr(dirs);
+            if(stat(path->str, &st) < 0 && errno == ENOENT){
+                if(!createpath(path)){
+                    set_errorno(E_CANNOTWRITEFILE);
+                    perror("error creando ruta");
+                    printf("Ruta: %s\n", path->str);
+                    exit(1);
+                }
             }
         }
         long bytescopied = savetofile(piu->header->filelist.fileinfo[i].filename,
