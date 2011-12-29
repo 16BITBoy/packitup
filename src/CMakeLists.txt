@@ -11,3 +11,4 @@ ADD_EXECUTABLE(piudel fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/d
 ADD_EXECUTABLE(piuview fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/view.c)
 ADD_EXECUTABLE(devtest EXCLUDE_FROM_ALL fdhandler/fdhandler.c errors/errors.c piu/piu.c main.c)
 ADD_EXECUTABLE(piuextract fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/extract.c)
+ADD_EXECUTABLE(check fdhandler/fdhandler.c errors/errors.c piu/piu.c tests/check_piu.c)
