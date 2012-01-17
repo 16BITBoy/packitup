@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "piu/piu.h"
+#include "../piu/piu.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
 
-
+/*
 int deletefile(PIUFILE *piu, unsigned long filenum){
 #define FCOUNT piu->header->filelist.filecount
 #define FINFO piu->header->filelist.fileinfo
@@ -28,7 +28,7 @@ int deletefile(PIUFILE *piu, unsigned long filenum){
     FCOUNT = FCOUNT - 1;
     return 1;
 }
-
+*/
 
 int main(int argc, char **argv){
     PIUFILE *piu = openpiufile(argv[1]);

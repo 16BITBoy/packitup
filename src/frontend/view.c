@@ -29,7 +29,7 @@ int main(int argc, char **argv){
     printf("------------------------------------\n");
     printf("Header size (bytes): %d\n\n", header->flistsize);
     printf("-------------Files------------------\n");
-    printf("Id\t\tFilename\t\tSize\n");
+    printf("Id\tSize\t\tFilename\n");
     
     if(header->filelist.filecount == 0){
         printf("\nThis file is empty\n\n");
@@ -37,9 +37,9 @@ int main(int argc, char **argv){
     }
     int i;
     for(i = 0; i < header->filelist.filecount; i++){
-        printf("%d\t%s\t\t%ld\n", i,
-                                  header->filelist.fileinfo[i].filename, 
-                                  header->filelist.fileinfo[i].size);
+        printf("%d\t%ld\t\t%s\n", i,
+                                  header->filelist.fileinfo[i].size, 
+                                  header->filelist.fileinfo[i].filename);
     }
    
     return 0;
