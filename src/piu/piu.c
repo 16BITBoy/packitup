@@ -10,6 +10,7 @@
 #define FCOUNT  piu->header->filelist.filecount
 #define FINFO   piu->header->filelist.fileinfo
 
+/*  creates a new PIUSTRING structure of 'len' max characters */
 PIUSTRING *newpiustring(int len){
     PIUSTRING *str = NULL; /*Just to shut up valgrind*/
     str = (PIUSTRING *)malloc(sizeof(PIUSTRING));
@@ -20,6 +21,7 @@ PIUSTRING *newpiustring(int len){
     return str;
 }
 
+/*  creates a new PIUSTRARR structure. */
 PIUSTRARR *newpiustrarr(){
     PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));
     strs->items = NULL;
@@ -27,6 +29,7 @@ PIUSTRARR *newpiustrarr(){
     return strs;
 }
 
+/*  adds a PIUSTRING item to the PIUSTRARR structure */
 PIUSTRARR *addpiustrarritem(PIUSTRARR *strs, PIUSTRING *str){
     strs->items = (PIUSTRING *)
                   realloc(strs->items, 
@@ -37,6 +40,8 @@ PIUSTRARR *addpiustrarritem(PIUSTRARR *strs, PIUSTRING *str){
     return strs;
 }
 
+/*  concatenates the PIUSTRINGs contained in the PIUSTRARR structure
+ *  each item separated by the slash character */
 PIUSTRING *concatpiustrarr(PIUSTRARR *strs){
     PIUSTRING *str = NULL;
     int finallen = 0;
@@ -54,8 +59,10 @@ PIUSTRING *concatpiustrarr(PIUSTRARR *strs){
     }
     return str;
 }
+
+/*  creates the path in the file system with all
+ *  parent directories */
 int createpath(PIUSTRING *path){
-    /*PIUSTRARR *strs = (PIUSTRARR *)malloc(sizeof(PIUSTRARR));*/
     PIUSTRARR *strs = newpiustrarr();
     path = rmparentpathname(path);
     strs = piustrsplit(path, '/');
@@ -81,6 +88,8 @@ int createpath(PIUSTRING *path){
     return 1;
 }
 
+/*  removes the initial '../' string and the initial slash from
+ *  the path name */
 PIUSTRING *rmparentpathname(PIUSTRING *path){
     int clean = 0;
     int i;
@@ -104,6 +113,9 @@ PIUSTRING *rmparentpathname(PIUSTRING *path){
     }
     return path; 
 }
+
+/*  creates a substring from 'src' beginning at 'start' and
+ *  ending in 'end', and stores it in 'dest' */
 int substr(char *dest, char *src, int start, int end){
     int j = 0;
     int i = 0;
@@ -115,6 +127,8 @@ int substr(char *dest, char *src, int start, int end){
     return j;
 }
 
+/*  Divides a PIUSTRING by a character separator 'sep'
+ *  and stores the fragments in a PIUSTRARR */
 PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
     PIUSTRARR *strs = NULL;
     int splits = 0;
@@ -151,8 +165,11 @@ PIUSTRARR *piustrsplit(PIUSTRING *str, char sep){
 
     return strs;
 }
-/*FIXME: There is a ugly thing here. Read one more byte to avoid reallocating */
+
+/*  checks if the file open in the file descriptor 'fd'
+ *  is a valid piufile */
 int ispiufile(int fd){
+    /*FIXME: There is a ugly thing here. Reading one more byte to avoid reallocating */
     DATA *dt = loadchkfile(fd, 0, 4);
     if(dt == NULL){
         set_errorno(E_CANNOTREADFILE);
@@ -172,6 +189,7 @@ int ispiufile(int fd){
     return 1;
 }
 
+/*  gets the file list size from the piufile 'fd'  */
 int getflistsize(int fd){
     DATA *buffer;
     buffer = loadchkfile(fd, 3, 4);
@@ -185,6 +203,10 @@ int getflistsize(int fd){
     return *flistsize;
 }
 
+/*  gets the information about the files stored
+    in the piufile and returns a pointer to an
+    array of FILEINFO structures with every
+    file information  */
 FILEINFO *getfileinfolist(int fd, int numfiles){
     FILEINFO *finfolist;
     finfolist = (FILEINFO *) malloc(sizeof(FILEINFO) * numfiles);
@@ -223,6 +245,8 @@ FILEINFO *getfileinfolist(int fd, int numfiles){
     return finfolist;
 }
 
+/*  reads the header information from the piufile 'fd'  
+ *  and returns a structure HEADERINFO with it.  */
 HEADERINFO *getpiuheader(int fd){
     HEADERINFO *header;
 
@@ -249,7 +273,8 @@ HEADERINFO *getpiuheader(int fd){
     return header;
 }
 
-
+/*  opens the piufile located at 'file' in the file system
+ *  and returns a PIUFILE structure with all the information.  */
 PIUFILE *openpiufile(char *file){
     PIUFILE *piu;
     piu = (PIUFILE *) malloc(sizeof(PIUFILE));
@@ -262,7 +287,7 @@ PIUFILE *openpiufile(char *file){
     if(piu->header == NULL)
         return NULL;
     unsigned long datapos;
-    datapos = HEADER_MINSIZE + piu->header->flistsize; /*It starts pointing to the data start position. */
+    datapos = HEADER_MINSIZE + piu->header->flistsize; /* It starts pointing to the data start position. */
     
     piu->filedata = (DATA *) realloc(piu->filedata, sizeof(DATA)*(piu->header->filelist.filecount + 1));
     DATA *readbuffer;
@@ -284,6 +309,7 @@ PIUFILE *openpiufile(char *file){
     return piu;
 }
 
+/*  creates an empty PIUFILE structure  */
 PIUFILE *createpiufile(){
     PIUFILE *piu;
     piu = (PIUFILE *) malloc(sizeof(PIUFILE));
@@ -295,6 +321,8 @@ PIUFILE *createpiufile(){
     return piu;
 }
 
+/*  writes the PIUFILE structure 'piu' in the file located
+ *  at 'filepath'  */
 int writepiu(PIUFILE *piu, char *filepath){
     /* Better create some defines for short naming */
     #define FINFO    piu->header->filelist.fileinfo
@@ -303,46 +331,51 @@ int writepiu(PIUFILE *piu, char *filepath){
     /* Unlink "deletes" the file */
     unlink(filepath);
     
-    DATA *writebuf;
+    DATA *writebuf; /* DATA structure used as buffer */
     writebuf = (DATA *) malloc(sizeof(DATA));
     
     char format[3] = "PIU";
     writebuf->data = format;
     writebuf->size = 3;
     
-    if(savetofile(filepath, writebuf) != 3){
+    if(savetofile(filepath, writebuf) != 3){ /* Error writing file format indicator */
         set_errorno(E_CANNOTWRITEFILE);
         return 0;
     }
-    /* Closing the file to commit changes to it, then reopening */
     
+    /* reopen the file created by the savetofile() previous call */
     int fd = fileopen(filepath, FCREATE);
-    if(fd < 0){
+    if(fd < 0){ /* error opening the file */
         set_errorno(E_CANNOTOPENFILE);
         return 0;
     }
+    
      
-    int hsize = piu->header->flistsize;
+    int hsize = piu->header->flistsize; /* header info size, minus 3 bytes
+                                           from format indicator */
+    
+    /* next write header (file list) info size into the file */
     writebuf->data = &hsize;
     writebuf->size = sizeof(int);
     
-    if(appendtofd(fd, writebuf) != sizeof(int)){
+    if(appendtofd(fd, writebuf) != sizeof(int)){ /* error writing file list size */
         set_errorno(E_CANNOTWRITEFILE);
         return 0;
     }
     
+    /* write file list information */
     int i;
     for(i = 0; i < FCOUNT; i++){
         writebuf->data = FINFO[i].filename;
         writebuf->size = 256; 
-        if(appendtofd(fd, writebuf) != 256){
+        if(appendtofd(fd, writebuf) != 256){ /* error writing one file name */
             set_errorno(E_CANNOTWRITEFILE);
             return 0;
         }
 
         writebuf->data = &FINFO[i].size;
         writebuf->size = sizeof(unsigned long);
-        if(appendtofd(fd, writebuf) != sizeof(unsigned long)){
+        if(appendtofd(fd, writebuf) != sizeof(unsigned long)){ /* error writing one file size */
             set_errorno(E_CANNOTWRITEFILE);
             return 0;
         }
@@ -350,7 +383,7 @@ int writepiu(PIUFILE *piu, char *filepath){
 
     /* Write file data */
     for(i = 0; i < FCOUNT; i++){
-        if(appendtofd(fd, &piu->filedata[i]) != piu->filedata[i].size){
+        if(appendtofd(fd, &piu->filedata[i]) != piu->filedata[i].size){ /* error writing file data */
             set_errorno(E_CANNOTWRITEFILE);
             return 0;
         }
@@ -360,6 +393,7 @@ int writepiu(PIUFILE *piu, char *filepath){
     return 1;
 }
 
+/*  adds a new file into the PIUFILE structure  */
 int addfile(PIUFILE *piu, char *filepath){
     /* Load file and check if it's readable */
     DATA *filedata;
