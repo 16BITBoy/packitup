@@ -49,7 +49,7 @@ DATA *loadfile(char *path)
 #else
 	int fd; /* file descriptor */
 	unsigned long size; /* file size */
-	int bytesread; /* bytes read from file */
+	unsigned long bytesread; /* bytes read from file */
 	DATA *data; /* the structure to be returned */
 	void *dataptr = NULL; /* place to store file data */
 
