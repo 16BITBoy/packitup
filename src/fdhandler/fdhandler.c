@@ -47,27 +47,29 @@ DATA *loadfile(char *path)
 #ifdef __WINDOWS__
 	//Win32API
 #else
-	int fd;
-	int size;
-	int bytesread;
-	DATA *data;
-	void *dataptr = NULL;
+	int fd; /* file descriptor */
+	int size; /* file size */
+	int bytesread; /* bytes read from file */
+	DATA *data; /* the structure to be returned */
+	void *dataptr = NULL; /* place to store file data */
 
 	fd = open(path, O_RDONLY);
 
-    if(fd < 0)
+    if(fd < 0) /* file descriptor not valid */
         return NULL;
-
+    
+    /* get file size and reset the offset */
 	size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-
+    
+    /* read file data */
 	dataptr = malloc(size);
 	bytesread = read(fd, dataptr, size);
 	if(bytesread < 0)
 		return NULL;
 
 	close(fd);
-
+    /* prepare data structure and return it. */
     data = (DATA *) malloc(sizeof(DATA));
 	data->data = dataptr;
 	data->size = size;
