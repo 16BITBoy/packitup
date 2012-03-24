@@ -25,8 +25,8 @@ DATA::DATA(void *address, unsigned long size){
 }
 
 DATA::~DATA(){
-    char *ptr = (char *) this->data;
-    delete ptr;
+    char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
+    delete[] ptr;
 }
 
 class FDHANDLER {
@@ -106,6 +106,21 @@ void test_data(){
     cout << "Tests passed for DATA class." << endl;
 }
 
+/* Manual test for readall function */
+void test_fdhandler_readall(string file){
+    FDHANDLER fd(file);
+    DATA *filedata = fd.readall();
+    assert(filedata != NULL);
+    assert(filedata->data != NULL);
+    assert(filedata->size > 0);
+    cout << filedata->size << " bytes read" << endl;
+    fstream fs("copy", ios::out | ios::binary);
+    fs.write((char*)filedata->data, filedata->size);
+    fs.close();
+    cout << "File copied into 'copy'. Check content." << endl;
+    delete filedata;
+}
+
 int main(int argc, char **argv){
     FDHANDLER fd("out");
     DATA *filedata = fd.readall();
@@ -117,5 +132,6 @@ int main(int argc, char **argv){
     fs.write((char*)filedata->data, filedata->size);
     fs.close();
     cout << "file copied into 'copy'" << endl;
+    delete filedata;
     return 0;
 }
