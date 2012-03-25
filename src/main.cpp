@@ -71,8 +71,10 @@ DATA *FDHANDLER::readall(){
     ssplitp = filepath.find_last_of('/');
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
-    char *wd = get_current_dir_name(); /* current working dir */
+    
 #ifdef __unix__
+    char *wd = get_current_dir_name(); /* current working dir */
+
     if(chdir(path.c_str()) < 0){
         perror(path.c_str());
     }    
@@ -113,8 +115,10 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     ssplitp = filepath.find_last_of('/');
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
-    char *wd = get_current_dir_name(); /* current working dir */
+    
 #ifdef __unix__
+    char *wd = get_current_dir_name(); /* current working dir */
+    
     if(chdir(path.c_str()) < 0){
         perror(path.c_str());
     }    
