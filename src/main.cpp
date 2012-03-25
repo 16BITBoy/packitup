@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <cassert>
 #include <string>
 
@@ -29,6 +28,11 @@ DATA::~DATA(){
     delete[] ptr;
 }
 
+#include <fstream>
+#ifdef __unix__
+#include <unistd.h>
+#endif
+
 class FDHANDLER {
     public:
     string filepath;
@@ -41,7 +45,7 @@ class FDHANDLER {
     
     /* load only a chunk of the fie of 'size' bytes from
      * the position at 'offset' */
-    DATA *readchk(unsigned long size, unsigned long offset);
+    DATA *readchk(unsigned long offset, unsigned long size);
     
     /* save data 'data' into the current file, overwriting it. */
     DATA *save(DATA *data);
@@ -63,8 +67,23 @@ DATA *FDHANDLER::readall(){
         return NULL;
     }
     
-    fstream fs(this->filepath.c_str(), ios::in | ios::binary);
+    int ssplitp; /* position where the filepath will be splitted */
+    ssplitp = filepath.find_last_of('/');
+    string path = filepath.substr(0, ssplitp); /* path where file is located */
+    string filename = filepath.substr(ssplitp + 1); /* file name */
+    char *wd = get_current_dir_name(); /* current working dir */
+#ifdef __unix__
+    if(chdir(path.c_str()) < 0){
+        perror(path.c_str());
+    }    
+#endif
     
+    fstream fs(filename.c_str(), ios::in | ios::binary);
+    if(fs.fail()){
+        cout << "Error opening file '" << filename << "'" << endl; 
+        return NULL;
+    }
+        
     /* get filesize */
     fs.seekg(0, ios::end);
     unsigned long filesize = fs.tellg();
@@ -80,8 +99,54 @@ DATA *FDHANDLER::readall(){
     fs.read((char*)filedata->data, filesize);
     filedata->size = fs.gcount();
     fs.close();
+#ifdef __unix__
+    chdir(wd);
+#endif
     return filedata;
 }
+
+DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
+    if(!this->filepath.compare("") || this->filepath.empty())
+        return NULL;
+    
+    int ssplitp; /* position where the filepath will be splitted */
+    ssplitp = filepath.find_last_of('/');
+    string path = filepath.substr(0, ssplitp); /* path where file is located */
+    string filename = filepath.substr(ssplitp + 1); /* file name */
+    char *wd = get_current_dir_name(); /* current working dir */
+#ifdef __unix__
+    if(chdir(path.c_str()) < 0){
+        perror(path.c_str());
+    }    
+#endif
+    
+    fstream fs(filename.c_str(), ios::in | ios::binary);
+    if(fs.fail()){
+        cout << "Error opening file '" << filename << "'" << endl; 
+        return NULL;
+    }
+        
+    /* get filesize */
+    fs.seekg(0, ios::end);
+    unsigned long filesize = fs.tellg();
+    
+    /* set offset to 'offset' */
+    fs.seekg(offset, ios::beg);
+    
+    /* allocate bytes needed */
+    DATA *filedata = new DATA();
+    filedata->data = new char[size];
+    
+    fs.read((char*)filedata->data, size);
+    filedata->size = fs.gcount();
+    fs.close();
+#ifdef __unix__
+    chdir(wd);
+#endif    
+    return filedata;
+}
+
+
 
 void test_data(){
     DATA *data = new DATA();
@@ -121,17 +186,22 @@ void test_fdhandler_readall(string file){
     delete filedata;
 }
 
-int main(int argc, char **argv){
-    FDHANDLER fd("out");
-    DATA *filedata = fd.readall();
+/* Manual test for readall function */
+void test_fdhandler_readchk(string file, unsigned long offset, unsigned long size){
+    FDHANDLER fd(file);
+    DATA *filedata = fd.readchk(offset, size);
     assert(filedata != NULL);
     assert(filedata->data != NULL);
-    assert(filedata->size > 0);
+    assert(filedata->size == size);
     cout << filedata->size << " bytes read" << endl;
     fstream fs("copy", ios::out | ios::binary);
     fs.write((char*)filedata->data, filedata->size);
     fs.close();
     cout << "file copied into 'copy'" << endl;
     delete filedata;
+}
+
+int main(int argc, char **argv){
+    test_fdhandler_readchk("prueba/out", 7, 5);
     return 0;
 }
