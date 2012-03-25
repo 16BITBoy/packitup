@@ -32,7 +32,9 @@ DATA::~DATA(){
 #ifdef __unix__
 #include <unistd.h>
 #endif
-
+#ifdef _WIN32
+#include <direct.h>
+#endif
 class FDHANDLER {
     public:
     string filepath;
@@ -71,14 +73,26 @@ DATA *FDHANDLER::readall(){
     ssplitp = filepath.find_last_of('/');
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
-    
+
+	/* get the current working dir and change it to 'path' */
 #ifdef __unix__
     char *wd = get_current_dir_name(); /* current working dir */
 
     if(chdir(path.c_str()) < 0){
         perror(path.c_str());
+		return NULL;
     }    
 #endif
+#ifdef _WIN32
+	char *wd = NULL;
+	_getcwd(wd, 32767); /* the size passed as second parameter is the max path characters in
+						   windows */
+	if(_chdir(path.c_str()) < 0){
+		cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+		return NULL;
+	}
+#endif
+
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
     if(fs.fail()){
@@ -103,6 +117,9 @@ DATA *FDHANDLER::readall(){
     fs.close();
 #ifdef __unix__
     chdir(wd);
+#endif
+#ifdef _WIN32
+	_chdir(wd);
 #endif
     return filedata;
 }
@@ -149,8 +166,6 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
 #endif    
     return filedata;
 }
-
-
 
 void test_data(){
     DATA *data = new DATA();
