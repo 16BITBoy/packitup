@@ -129,16 +129,35 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
         return NULL;
     
     int ssplitp; /* position where the filepath will be splitted */
-    ssplitp = filepath.find_last_of('/');
+
+	//folder separator changes from unix to windows
+#ifdef __unix__
+	char separator = '/';
+#endif
+#ifdef _WIN32
+	char separator = '\\';
+#endif
+    ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
     
+	/* get the current working dir and change it to 'path' */
 #ifdef __unix__
     char *wd = get_current_dir_name(); /* current working dir */
-    
+
     if(chdir(path.c_str()) < 0){
         perror(path.c_str());
+		return NULL;
     }    
+#endif
+#ifdef _WIN32
+	char *wd = NULL;
+	wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
+						   windows */
+	if(_chdir(path.c_str()) < 0){
+		cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+		return NULL;
+	}
 #endif
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
@@ -163,7 +182,10 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     fs.close();
 #ifdef __unix__
     chdir(wd);
-#endif    
+#endif
+#ifdef _WIN32
+	_chdir(wd);
+#endif
     return filedata;
 }
 
@@ -221,6 +243,15 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
 }
 
 int main(int argc, char **argv){
-    test_fdhandler_readchk("prueba/out", 7, 5);
+	char c;
+	/*fstream fs("fichero", ios::out | ios::binary);
+	char *data = new char[1024 * 1024];
+	unsigned long i;
+	for(i = 0; i < 1024 * 1024; i++){
+		data[i] = 1;
+	}
+	fs << data;*/
+    test_fdhandler_readchk("carpeta\\fichero", 7, 5);
+	cin >> c;
     return 0;
 }
