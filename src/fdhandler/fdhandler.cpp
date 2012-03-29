@@ -34,6 +34,10 @@ FDHANDLER::FDHANDLER(string filepath){
     this->filepath.append(filepath);
 }
 
+bool FDHANDLER::error(){
+    return this->_error;
+}
+
 DATA *FDHANDLER::readall(){
     if(!this->filepath.compare("") || this->filepath.empty()){ /* filepath not specified */
         return NULL;
@@ -54,15 +58,14 @@ DATA *FDHANDLER::readall(){
     }    
 #endif
 #ifdef _WIN32
-	char *wd = NULL;
-	wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
+    char *wd = NULL;
+    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
 						   windows */
-	if(_chdir(path.c_str()) < 0){
-		cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-		return NULL;
-	}
+    if(_chdir(path.c_str()) < 0){
+        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+        return NULL;
+    }
 #endif
-
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
     if(fs.fail()){
@@ -89,7 +92,7 @@ DATA *FDHANDLER::readall(){
     chdir(wd);
 #endif
 #ifdef _WIN32
-	_chdir(wd);
+    _chdir(wd);
 #endif
     return filedata;
 }
@@ -102,10 +105,10 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
 
 	//folder separator changes from unix to windows
 #ifdef __unix__
-	char separator = '/';
+    char separator = '/';
 #endif
 #ifdef _WIN32
-	char separator = '\\';
+    char separator = '\\';
 #endif
     ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
     string path = filepath.substr(0, ssplitp); /* path where file is located */
@@ -121,13 +124,13 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     }    
 #endif
 #ifdef _WIN32
-	char *wd = NULL;
-	wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
+    char *wd = NULL;
+    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
 						   windows */
-	if(_chdir(path.c_str()) < 0){
-		cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-		return NULL;
-	}
+    if(_chdir(path.c_str()) < 0){
+        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+        return NULL;
+    }
 #endif
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
@@ -154,7 +157,57 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     chdir(wd);
 #endif
 #ifdef _WIN32
-	_chdir(wd);
+    _chdir(wd);
 #endif
     return filedata;
+}
+
+FDHANDLER& FDHANDLER::write(DATA *data){
+    if(!this->filepath.compare("") || this->filepath.empty())
+        return *this;
+
+    int ssplitp; /* position where the filepath will be splitted */
+
+    //folder separator changes from unix to windows
+#ifdef __unix__
+    char separator = '/';
+#endif
+#ifdef _WIN32
+    char separator = '\\';
+#endif
+    ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
+    string path = filepath.substr(0, ssplitp); /* path where file is located */
+    string filename = filepath.substr(ssplitp + 1); /* file name */
+
+    /* get the current working dir and change it to 'path' */
+#ifdef __unix__
+    char *wd = get_current_dir_name(); /* current working dir */
+
+    if(chdir(path.c_str()) < 0){
+        perror(path.c_str());
+        return *this;
+    }
+#endif
+#ifdef _WIN32
+    char *wd = NULL;
+    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
+                           windows */
+    if(_chdir(path.c_str()) < 0){
+        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+        return *this;
+    }
+#endif
+
+    fstream fs(filename.c_str(), ios::out | ios::binary);
+    if(fs.fail()){
+            cout << "Error opening file '" << filename << "'" << endl;
+            return *this;
+    }
+    fs.write((char*)data->data, data->size);
+    if(fs.bad()){
+        return *this;
+    }
+
+    //TODO: Method incomplete.
+
 }

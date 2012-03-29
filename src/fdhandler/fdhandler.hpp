@@ -20,18 +20,25 @@ class FDHANDLER {
      * with the file data */
     DATA *readall();
     
-    /* load only a chunk of the fie of 'size' bytes from
+    /* load only a chunk of the file of 'size' bytes from
      * the position at 'offset' */
     DATA *readchk(unsigned long offset, unsigned long size);
     
     /* save data 'data' into the current file, overwriting it. */
-    DATA *save(DATA *data);
+    FDHANDLER& write(DATA *data);
     
     /* save data 'data' at the end of the current file */
-    DATA *append(DATA *data);
+    unsigned long append(DATA *data);
     
+    /* true if an error happened during a call to any of the read
+     * and write methods.
+     */
+    bool error();
+
     /* close the current file */
     void close();
-   
+
+    private:
+    bool _error;
 };
 #endif //_FDHANDLER_HPP
