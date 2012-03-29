@@ -2,36 +2,9 @@
 #include <cassert>
 #include <fstream>
 
-#include "fdhandler/fdhandler.hpp"
+#include "../fdhandler/fdhandler.hpp"
 
 using namespace std;
-
-void test_data(){
-    // Silly tests for a silly class :D
-    // Empty object should be not null but empty (Silly test yeah xD)
-    DATA *data = new DATA(); 
-    assert(data != NULL);
-    assert(data->data == NULL);
-    assert(data->size == 0);
-    delete data;
-    
-    // Object pointing to int value.
-    int i = 453;
-    data = new DATA(&i, sizeof i);
-    assert(data != NULL);
-    assert(data->data == &i);
-    assert(data->size == sizeof i);
-    delete data;
-    
-    // Object pointing to dynamically allocated int
-    int *a = new int[3];
-    data = new DATA(a, sizeof(int)*3);
-    assert(data != NULL);
-    assert(data->data == a);
-    assert(data->size == sizeof(int)*3);
-    delete data;
-    cout << "Tests passed for DATA class." << endl;
-}
 
 /* Manual test for readall function */
 void test_fdhandler_readall(string file){
@@ -63,16 +36,4 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
     delete filedata;
 }
 
-int main(int argc, char **argv){
-	char c;
-	/*fstream fs("fichero", ios::out | ios::binary);
-	char *data = new char[1024 * 1024];
-	unsigned long i;
-	for(i = 0; i < 1024 * 1024; i++){
-		data[i] = 1;
-	}
-	fs << data;*/
-    test_fdhandler_readchk("carpeta\\fichero", 7, 5);
-	cin >> c;
-    return 0;
-}
+
