@@ -36,4 +36,18 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
     delete filedata;
 }
 
+/* Manual test for write function */
+void test_fdhandler_write(string outfile){
+    FDHANDLER fd(outfile);
+    DATA *buffer = new DATA(new char[1024], 1024);
+    unsigned long i;
+    char *c;
+    for(i = 0; i < 1024; i++){
+        c = (char*)buffer->data;
+        *(c + i) = 7;
+    }
+    fd.write(buffer);
+    assert(!fd.error());
+    delete buffer;
+}
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 
@@ -32,6 +33,7 @@ DATA::~DATA(){
 
 FDHANDLER::FDHANDLER(string filepath){
     this->filepath.append(filepath);
+    this->_error = false;
 }
 
 bool FDHANDLER::error(){
@@ -40,6 +42,7 @@ bool FDHANDLER::error(){
 
 DATA *FDHANDLER::readall(){
     if(!this->filepath.compare("") || this->filepath.empty()){ /* filepath not specified */
+        this->_error = true;
         return NULL;
     }
     
@@ -48,28 +51,37 @@ DATA *FDHANDLER::readall(){
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
 
-	/* get the current working dir and change it to 'path' */
+    char *wd = NULL;
+    /* Get the current working directory */
 #ifdef __unix__
-    char *wd = get_current_dir_name(); /* current working dir */
-
-    if(chdir(path.c_str()) < 0){
-        perror(path.c_str());
-		return NULL;
-    }    
+    wd = get_current_dir_name();
 #endif
 #ifdef _WIN32
-    char *wd = NULL;
-    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
-						   windows */
-    if(_chdir(path.c_str()) < 0){
-        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-        return NULL;
-    }
+    wd = _getcwd(NULL, 0);
 #endif
+
+    if(path.compare(filename) != 0){ //Returns 0 if true.
+    /* change dir to path*/
+#ifdef __unix__
+        if(chdir(path.c_str()) < 0){
+            perror(path.c_str());
+            this->_error = true;
+            return NULL;
+        }
+#endif
+#ifdef _WIN32
+        if(_chdir(path.c_str()) < 0){
+            cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+            this->_error = true;
+            return NULL;
+        }
+#endif
+    }
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
     if(fs.fail()){
-        cout << "Error opening file '" << filename << "'" << endl; 
+        cout << "Error opening file '" << filename << "'" << endl;
+        this->_error = true;
         return NULL;
     }
         
@@ -98,8 +110,10 @@ DATA *FDHANDLER::readall(){
 }
 
 DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
-    if(!this->filepath.compare("") || this->filepath.empty())
+    if(!this->filepath.compare("") || this->filepath.empty()){
+        this->_error = true;
         return NULL;
+    }
     
     int ssplitp; /* position where the filepath will be splitted */
 
@@ -113,29 +127,42 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
-    
-	/* get the current working dir and change it to 'path' */
-#ifdef __unix__
-    char *wd = get_current_dir_name(); /* current working dir */
 
-    if(chdir(path.c_str()) < 0){
-        perror(path.c_str());
-		return NULL;
-    }    
+    char *wd = NULL;
+    /* Get the current working directory */
+#ifdef __unix__
+    wd = get_current_dir_name();
 #endif
 #ifdef _WIN32
-    char *wd = NULL;
-    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
-						   windows */
-    if(_chdir(path.c_str()) < 0){
-        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-        return NULL;
-    }
+    wd = _getcwd(NULL, 0);
 #endif
+
+    /* Since path and filename are the same when there is
+         * no directory in filepath, we check for this equality
+         * to prevent changing current directory.
+         */
+    if(path.compare(filename) != 0){ //Returns 0 if true.
+    /* change dir to path*/
+#ifdef __unix__
+        if(chdir(path.c_str()) < 0){
+            perror(path.c_str());
+            this->_error = true;
+            return NULL;
+        }
+#endif
+#ifdef _WIN32
+        if(_chdir(path.c_str()) < 0){
+            cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+            this->_error = true;
+            return NULL;
+        }
+#endif
+    }
     
     fstream fs(filename.c_str(), ios::in | ios::binary);
     if(fs.fail()){
-        cout << "Error opening file '" << filename << "'" << endl; 
+        cout << "Error opening file '" << filename << "'" << endl;
+        this->_error = true;
         return NULL;
     }
         
@@ -159,12 +186,19 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
 #ifdef _WIN32
     _chdir(wd);
 #endif
+    /* If the read operation failed retrieving 'size' bytes, return bytes read */
+    if(fs.fail()){
+        this->_error = true;
+        return filedata;
+    }
     return filedata;
 }
 
 FDHANDLER& FDHANDLER::write(DATA *data){
-    if(!this->filepath.compare("") || this->filepath.empty())
+    if(!this->filepath.compare("") || this->filepath.empty()){
+        this->_error = true;
         return *this;
+    }
 
     int ssplitp; /* position where the filepath will be splitted */
 
@@ -179,35 +213,63 @@ FDHANDLER& FDHANDLER::write(DATA *data){
     string path = filepath.substr(0, ssplitp); /* path where file is located */
     string filename = filepath.substr(ssplitp + 1); /* file name */
 
-    /* get the current working dir and change it to 'path' */
+    char *wd = NULL;
+    /* Get the current working directory */
 #ifdef __unix__
-    char *wd = get_current_dir_name(); /* current working dir */
-
-    if(chdir(path.c_str()) < 0){
-        perror(path.c_str());
-        return *this;
-    }
+    wd = get_current_dir_name();
 #endif
 #ifdef _WIN32
-    char *wd = NULL;
-    wd = _getcwd(NULL, 0); /* the size passed as second parameter is the max path characters in
-                           windows */
-    if(_chdir(path.c_str()) < 0){
-        cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-        return *this;
-    }
+    wd = _getcwd(NULL, 0);
 #endif
+
+    /* Since path and filename are the same when there is
+         * no directory in filepath, we check for this equality
+         * to prevent changing current directory.
+         */
+    if(path.compare(filename) != 0){ //Returns 0 if true.
+    /* change dir to path*/
+#ifdef __unix__
+        if(chdir(path.c_str()) < 0){
+            perror(path.c_str());
+            this->_error = true;
+            return *this;
+        }
+#endif
+#ifdef _WIN32
+        if(_chdir(path.c_str()) < 0){
+            cout << "Unable to access directory '" << path.c_str() << "'" << endl;
+            this->_error = true;
+            return *this;
+        }
+#endif
+    }
 
     fstream fs(filename.c_str(), ios::out | ios::binary);
     if(fs.fail()){
-            cout << "Error opening file '" << filename << "'" << endl;
-            return *this;
-    }
-    fs.write((char*)data->data, data->size);
-    if(fs.bad()){
+        cout << "Error opening file '" << filename << "'" << endl;
+        this->_error = true;
         return *this;
     }
 
-    //TODO: Method incomplete.
+    fs.write((char*)data->data, data->size);
+    if(fs.bad()){
+        this->_error = true;
+        return *this;
+    }
 
+    fs.close();
+
+#ifdef __unix__
+    chdir(wd);
+#endif
+#ifdef _WIN32
+    _chdir(wd);
+#endif
+
+    free(wd);
+    return *this;
+}
+
+bool FDHANDLER::operator!(){
+    return this->error();
 }

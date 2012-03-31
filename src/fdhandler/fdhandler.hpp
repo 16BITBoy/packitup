@@ -10,14 +10,26 @@ class DATA {
     ~DATA();
 };
 
+/**
+ * \brief This class allows fast coding of file data reading and writing.
+ * Works using DATA objects to return the data retrieved and to write data
+ * to a file.
+ */
 class FDHANDLER {
     public:
     std::string filepath;
     
     FDHANDLER(std::string filepath);
     
-    /* load the entire file and return a DATA structure
-     * with the file data */
+    /**
+     * \brief Loads the entire file and returns a pointer to DATA object
+     * with the file data.
+     *
+     * \details First attepts to read the whole file specified in FDHANDLER::filepath. If it
+     * succeded, returns a pointer to DATA object with all the file data.
+     * In case an error happened, returns a NULL pointer and if FDHANDLER::error() is called
+     * after, returns true.
+     * */
     DATA *readall();
     
     /* load only a chunk of the file of 'size' bytes from
@@ -35,10 +47,10 @@ class FDHANDLER {
      */
     bool error();
 
-    /* close the current file */
-    void close();
+    bool operator!();
 
     private:
     bool _error;
+    void resetcwd(char *wd);
 };
 #endif //_FDHANDLER_HPP
