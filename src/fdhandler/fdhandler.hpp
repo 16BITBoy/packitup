@@ -30,14 +30,14 @@ class FDHANDLER {
      * In case an error happened, returns a NULL pointer and if FDHANDLER::error() is called
      * after, returns true.
      * */
-    DATA *readall();
+    FDHANDLER &readall(DATA *filedata);
     
     /* load only a chunk of the file of 'size' bytes from
      * the position at 'offset' */
-    DATA *readchk(unsigned long offset, unsigned long size);
+    FDHANDLER &readchk(DATA *filedata, unsigned long offset, unsigned long size);
     
     /* save data 'data' into the current file, overwriting it. */
-    FDHANDLER& write(DATA *data);
+    FDHANDLER &write(DATA *data);
     
     /* save data 'data' at the end of the current file */
     unsigned long append(DATA *data);

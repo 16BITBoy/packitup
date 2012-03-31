@@ -40,10 +40,10 @@ bool FDHANDLER::error(){
     return this->_error;
 }
 
-DATA *FDHANDLER::readall(){
+FDHANDLER &FDHANDLER::readall(DATA *filedata){
     if(!this->filepath.compare("") || this->filepath.empty()){ /* filepath not specified */
         this->_error = true;
-        return NULL;
+        return *this;
     }
     
     int ssplitp; /* position where the filepath will be splitted */
@@ -66,14 +66,14 @@ DATA *FDHANDLER::readall(){
         if(chdir(path.c_str()) < 0){
             perror(path.c_str());
             this->_error = true;
-            return NULL;
+            return *this;
         }
 #endif
 #ifdef _WIN32
         if(_chdir(path.c_str()) < 0){
             cout << "Unable to access directory '" << path.c_str() << "'" << endl;
             this->_error = true;
-            return NULL;
+            return *this;
         }
 #endif
     }
@@ -82,7 +82,7 @@ DATA *FDHANDLER::readall(){
     if(fs.fail()){
         cout << "Error opening file '" << filename << "'" << endl;
         this->_error = true;
-        return NULL;
+        return *this;
     }
         
     /* get filesize */
@@ -93,7 +93,10 @@ DATA *FDHANDLER::readall(){
     fs.seekg(0, ios::beg);
     
     /* allocate bytes needed */
-    DATA *filedata = new DATA();
+    if(filedata == NULL){ /* 'filedata' MUST be allocated before call this method */
+        this->_error = true;
+        return *this;
+    }
     filedata->data = new char[filesize];
     
     /* read file and that's all folks :D */
@@ -106,15 +109,15 @@ DATA *FDHANDLER::readall(){
 #ifdef _WIN32
     _chdir(wd);
 #endif
-    return filedata;
+    return *this;
 }
 
-DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
+FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned long size){
     if(!this->filepath.compare("") || this->filepath.empty()){
         this->_error = true;
-        return NULL;
+        return *this;
     }
-    
+
     int ssplitp; /* position where the filepath will be splitted */
 
 	//folder separator changes from unix to windows
@@ -147,36 +150,35 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
         if(chdir(path.c_str()) < 0){
             perror(path.c_str());
             this->_error = true;
-            return NULL;
+            return *this;
         }
 #endif
 #ifdef _WIN32
         if(_chdir(path.c_str()) < 0){
             cout << "Unable to access directory '" << path.c_str() << "'" << endl;
             this->_error = true;
-            return NULL;
+            return *this;
         }
 #endif
     }
-    
+
     fstream fs(filename.c_str(), ios::in | ios::binary);
     if(fs.fail()){
         cout << "Error opening file '" << filename << "'" << endl;
         this->_error = true;
-        return NULL;
+        return *this;
     }
-        
+
     /* get filesize */
     fs.seekg(0, ios::end);
     unsigned long filesize = fs.tellg();
-    
+
     /* set offset to 'offset' */
     fs.seekg(offset, ios::beg);
-    
+
     /* allocate bytes needed */
-    DATA *filedata = new DATA();
     filedata->data = new char[size];
-    
+
     fs.read((char*)filedata->data, size);
     filedata->size = fs.gcount();
     fs.close();
@@ -189,9 +191,8 @@ DATA *FDHANDLER::readchk(unsigned long offset, unsigned long size){
     /* If the read operation failed retrieving 'size' bytes, return bytes read */
     if(fs.fail()){
         this->_error = true;
-        return filedata;
     }
-    return filedata;
+    return *this;
 }
 
 FDHANDLER& FDHANDLER::write(DATA *data){

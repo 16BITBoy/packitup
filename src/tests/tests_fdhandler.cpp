@@ -9,7 +9,8 @@ using namespace std;
 /* Manual test for readall function */
 void test_fdhandler_readall(string file){
     FDHANDLER fd(file);
-    DATA *filedata = fd.readall();
+    DATA *filedata = new DATA();
+    fd.readall(filedata);
     assert(filedata != NULL);
     assert(filedata->data != NULL);
     assert(filedata->size > 0);
@@ -24,7 +25,8 @@ void test_fdhandler_readall(string file){
 /* Manual test for readall function */
 void test_fdhandler_readchk(string file, unsigned long offset, unsigned long size){
     FDHANDLER fd(file);
-    DATA *filedata = fd.readchk(offset, size);
+    DATA *filedata = new DATA();
+    fd.readchk(filedata, offset, size);
     assert(filedata != NULL);
     assert(filedata->data != NULL);
     assert(filedata->size == size);
