@@ -7,9 +7,9 @@
 using namespace std;
 
 /* Manual test for readall function */
-void test_fdhandler_readall(string file){
+void test_fdhandler_readall(string file){ //Needs an actual file to test
     FDHANDLER fd(file);
-    DATA *filedata = new DATA();
+    DATA *filedata = new DATA(true);
     fd.readall(filedata);
     assert(filedata != NULL);
     assert(filedata->data != NULL);
@@ -23,9 +23,9 @@ void test_fdhandler_readall(string file){
 }
 
 /* Manual test for readall function */
-void test_fdhandler_readchk(string file, unsigned long offset, unsigned long size){
+void test_fdhandler_readchk(string file, unsigned long offset, unsigned long size){//Needs actual file to test
     FDHANDLER fd(file);
-    DATA *filedata = new DATA();
+    DATA *filedata = new DATA(true);
     fd.readchk(filedata, offset, size);
     assert(filedata != NULL);
     assert(filedata->data != NULL);
@@ -39,9 +39,9 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
 }
 
 /* Manual test for write function */
-void test_fdhandler_write(string outfile){
+void test_fdhandler_write(string outfile){//output filename
     FDHANDLER fd(outfile);
-    DATA *buffer = new DATA(new char[1024], 1024);
+    DATA *buffer = new DATA(new char[1024], 1024,true);
     unsigned long i;
     char *c;
     for(i = 0; i < 1024; i++){

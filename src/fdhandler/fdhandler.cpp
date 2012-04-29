@@ -15,21 +15,24 @@
 
 using namespace std;
 
-DATA::DATA(){
+DATA::DATA(bool dynamic){
     data = NULL;
     size = 0;
+    isDynAlloc = dynamic;
 }
 
-DATA::DATA(void *address, unsigned long size){
+DATA::DATA(void *address, unsigned long size, bool dynamic){
     data = address;
     this->size = size;
+    isDynAlloc = dynamic;
 }
 
 DATA::~DATA(){
-    char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
-    delete[] ptr;
+    if(isDynAlloc){
+        char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
+        delete[] ptr;
+    }
 }
-
 
 FDHANDLER::FDHANDLER(string filepath){
     this->filepath.append(filepath);

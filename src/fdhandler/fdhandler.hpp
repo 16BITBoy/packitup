@@ -2,12 +2,16 @@
 #define _FDHANDLER_HPP
 
 class DATA {
-    public:
+public:
     void *data; /* place where data is located */
     unsigned long size; /* size of data */
-    DATA();
-    DATA(void *address, unsigned long size);
+    DATA(bool dynamic);
+    DATA(void *address, unsigned long size, bool dynamic);
     ~DATA();
+
+private:
+    bool isDynAlloc;
+
 };
 
 /**
