@@ -7,7 +7,9 @@ using namespace std;
 
 void test_data(){
     // Silly tests for a silly class :D
-    // Empty object should be not null but empty (Silly test yeah xD)
+    // But they are needed to save me from my own "stupidity"
+    // So if I do something wrong like the below assert expressions
+    // this would shout at me before I run buggy software xD
     DATA *data = new DATA(false);
     assert(data != NULL);
     assert(data->data == NULL);
