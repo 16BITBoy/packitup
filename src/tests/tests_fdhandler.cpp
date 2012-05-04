@@ -53,3 +53,17 @@ void test_fdhandler_write(string outfile){//output filename
     delete buffer;
 }
 
+void test_fdhandler_append(string targetfile){
+    cout << "Testing FDHANDLER::append()" << endl << endl;
+    FDHANDLER *fd = new FDHANDLER(targetfile);
+    string s = "Test passed: ";
+    fd->write(new DATA((void *)s.c_str(),13,false));
+    fd->append(new DATA((void *)"OK",2,false));
+    DATA *result = new DATA(true);
+    fd->readall(result);
+    string r = (char *)result->data ;
+    assert(!r.compare("Test passed: OK"));
+    cout << r << endl;
+    delete fd;
+    delete result;
+}
