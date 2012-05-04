@@ -72,7 +72,7 @@ class FDHANDLER {
      * returns true.
      * \return The instance of the object that called its method.
      * */
-    unsigned long append(DATA *data);
+    FDHANDLER &append(DATA *data);
     
     /**
      * \brief Tells if the object is in error state.
