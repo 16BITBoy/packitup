@@ -74,6 +74,9 @@ class FDHANDLER {
      * */
     FDHANDLER &append(DATA *data);
     
+    FDHANDLER &write(char *data, unsigned long size);
+    FDHANDLER &append(char *data, unsigned long size);
+
     /**
      * \brief Tells if the object is in error state.
      *
@@ -98,7 +101,6 @@ class FDHANDLER {
     private:
     bool _error;
     void resetcwd(char *wd);
-    public:
     void _write(char *data, unsigned long size, bool append);
 };
 #endif //_FDHANDLER_HPP

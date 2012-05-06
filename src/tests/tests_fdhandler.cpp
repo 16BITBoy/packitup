@@ -40,21 +40,56 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
 
 /* Manual test for write function */
 void test_fdhandler_write(string outfile){//output filename
+    cout << "Testing FDHANDLER::write(DATA *)" << endl;
+    cout << "---------------------------------" << endl;
     FDHANDLER fd(outfile);
-    DATA *buffer = new DATA(new char[1024], 1024,true);
+    DATA *outbuffer = new DATA(new char[1024], 1024,true);
     unsigned long i;
     char *c;
+    c = (char*)outbuffer->data;
     for(i = 0; i < 1024; i++){
-        c = (char*)buffer->data;
         *(c + i) = 7;
     }
-    fd.write(buffer);
+    fd.write(outbuffer);
+    DATA *inbuffer = new DATA(true);
+    char *c2;
+    fd.readall(inbuffer);
+    c2 = (char *)inbuffer->data;
+    for(i = 0; i < 1024; i++){
+        assert(*(c + i) == *(c2 + i));
+    }
     assert(!fd.error());
-    delete buffer;
+    cout << "Test passed!" << endl << endl;
+    delete outbuffer;
+    delete inbuffer;
+}
+
+void test_fdhandler_write2(string outfile){//output filename
+    cout << "Testing FDHANDLER::write(char *, unsigned long)" << endl;
+    cout << "---------------------------------" << endl;
+    FDHANDLER fd(outfile);
+    unsigned long i;
+    char *c = new char[1024];
+    for(i = 0; i < 1024; i++){
+        *(c + i) = 7;
+    }
+    fd.write(c,1024);
+    DATA *inbuffer = new DATA(true);
+    char *c2;
+    fd.readall(inbuffer);
+    c2 = (char *)inbuffer->data;
+    for(i = 0; i < 1024; i++){
+        assert(*(c + i) == *(c2 + i));
+    }
+    assert(!fd.error());
+    cout << "Test passed!" << endl << endl;
+    delete c;
+    delete inbuffer;
 }
 
 void test_fdhandler_append(string targetfile){
-    cout << "Testing FDHANDLER::append()" << endl << endl;
+    cout << "Testing FDHANDLER::append(DATA *)" << endl;
+    cout << "---------------------------------" << endl;
     FDHANDLER *fd = new FDHANDLER(targetfile);
     string s = "Test passed: ";
     fd->write(new DATA((void *)s.c_str(),13,false));
@@ -63,28 +98,28 @@ void test_fdhandler_append(string targetfile){
     fd->readall(result);
     string r = (char *)result->data ;
     assert(!r.compare("Test passed: OK"));
-    cout << r << endl;
+    cout << "Test passed!" << endl << endl;
     delete fd;
     delete result;
 }
 
-void test_fdhandler__write(string targetfile){
-    cout << "Testing FDHANDLER::_write()" << endl << endl;
+void test_fdhandler_append2(string targetfile){
+    cout << "Testing FDHANDLER::append(char *, unsigned long)" << endl;
+    cout << "---------------------------------" << endl;
     FDHANDLER *fd = new FDHANDLER(targetfile);
     string s = "Test passed: ";
-    fd->_write((char *)s.c_str(),14,false);
+    fd->write((char *)s.c_str(),14);
     int i = 220;
-    fd->_write((char *)&i,sizeof(int),true);
+    fd->append((char *)&i,sizeof(int));
     DATA *result = new DATA(true);
     fd->readchk(result, 0, 14);
     string r = (char *)result->data;
     fd->readchk(result, 14, 4);
     int *j = (int *)result->data;
     i = *j;
-    cout << r << endl;
     assert(!r.compare("Test passed: "));
     assert(i == 220);
-    cout << "Test passed!" << endl;
+    cout << "Test passed!" << endl << endl;
     delete fd;
     delete result;
 }

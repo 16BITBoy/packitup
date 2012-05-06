@@ -199,154 +199,22 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
 }
 
 FDHANDLER& FDHANDLER::write(DATA *data){
-    if(!this->filepath.compare("") || this->filepath.empty()){
-        this->_error = true;
-        return *this;
-    }
-
-    int ssplitp; /* position where the filepath will be splitted */
-
-    //folder separator changes from unix to windows
-#ifdef __unix__
-    char separator = '/';
-#endif
-#ifdef _WIN32
-    char separator = '\\';
-#endif
-    ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
-    string path = filepath.substr(0, ssplitp); /* path where file is located */
-    string filename = filepath.substr(ssplitp + 1); /* file name */
-
-    char *wd = NULL;
-    /* Get the current working directory */
-#ifdef __unix__
-    wd = get_current_dir_name();
-#endif
-#ifdef _WIN32
-    wd = _getcwd(NULL, 0);
-#endif
-
-    /* Since path and filename are the same when there is
-         * no directory in filepath, we check for this equality
-         * to prevent changing current directory.
-         */
-    if(path.compare(filename) != 0){ //Returns 0 if true.
-    /* change dir to path*/
-#ifdef __unix__
-        if(chdir(path.c_str()) < 0){
-            perror(path.c_str());
-            this->_error = true;
-            return *this;
-        }
-#endif
-#ifdef _WIN32
-        if(_chdir(path.c_str()) < 0){
-            cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-            this->_error = true;
-            return *this;
-        }
-#endif
-    }
-
-    fstream fs(filename.c_str(), ios::out | ios::binary);
-    if(fs.fail()){
-        cout << "Error opening file '" << filename << "'" << endl;
-        this->_error = true;
-        return *this;
-    }
-
-    fs.write((char*)data->data, data->size);
-    if(fs.bad()){
-        this->_error = true;
-        return *this;
-    }
-
-    fs.close();
-
-#ifdef __unix__
-    chdir(wd);
-#endif
-#ifdef _WIN32
-    _chdir(wd);
-#endif
-
-    free(wd);
+    _write((char *)data->data, data->size, false);
     return *this;
 }
 
 FDHANDLER& FDHANDLER::append(DATA *data){
-    if(!this->filepath.compare("") || this->filepath.empty()){
-        this->_error = true;
-        return *this;
-    }
+    _write((char *)data->data, data->size, true);
+    return *this;
+}
 
-    int ssplitp; /* position where the filepath will be splitted */
+FDHANDLER &FDHANDLER::write(char *data, unsigned long size){
+    _write(data, size, false);
+    return *this;
+}
 
-    //folder separator changes from unix to windows
-#ifdef __unix__
-    char separator = '/';
-#endif
-#ifdef _WIN32
-    char separator = '\\';
-#endif
-    ssplitp = filepath.find_last_of(separator); //split where last folder separator is located
-    string path = filepath.substr(0, ssplitp); /* path where file is located */
-    string filename = filepath.substr(ssplitp + 1); /* file name */
-
-    char *wd = NULL;
-    /* Get the current working directory */
-#ifdef __unix__
-    wd = get_current_dir_name();
-#endif
-#ifdef _WIN32
-    wd = _getcwd(NULL, 0);
-#endif
-
-    /* Since path and filename are the same when there is
-         * no directory in filepath, we check for this equality
-         * to prevent changing current directory.
-         */
-    if(path.compare(filename) != 0){ //Returns 0 if true.
-    /* change dir to path*/
-#ifdef __unix__
-        if(chdir(path.c_str()) < 0){
-            perror(path.c_str());
-            this->_error = true;
-            return *this;
-        }
-#endif
-#ifdef _WIN32
-        if(_chdir(path.c_str()) < 0){
-            cout << "Unable to access directory '" << path.c_str() << "'" << endl;
-            this->_error = true;
-            return *this;
-        }
-#endif
-    }
-
-    fstream fs(filename.c_str(), ios::out | ios::binary | ios::app);
-    if(fs.fail()){
-        cout << "Error opening file '" << filename << "'" << endl;
-        this->_error = true;
-        return *this;
-    }
-
-    fs.write((char*)data->data, data->size);
-    if(fs.bad()){
-        this->_error = true;
-        return *this;
-    }
-
-    fs.close();
-
-#ifdef __unix__
-    chdir(wd);
-#endif
-#ifdef _WIN32
-    _chdir(wd);
-#endif
-
-    free(wd);
+FDHANDLER &FDHANDLER::append(char *data, unsigned long size){
+    _write(data, size, true);
     return *this;
 }
 
