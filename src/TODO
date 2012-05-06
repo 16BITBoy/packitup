@@ -1,7 +1,12 @@
 ::Find a way to remove and avoid use of DATA objects for addressing local variables
 
-The reason why I use DATA objects for addressing local variables is that when I need to use FDHANDLER to write int, long, char, float, or double values to a file I have to give to FDHANDLER::write() and FDHANDLER::append() functions a DATA object.
+The reason why I use DATA objects for addressing local variables is that when I need to use 
+FDHANDLER to write int, long, char, float, or double values to a file I have to give to 
+FDHANDLER::write() and FDHANDLER::append() functions a DATA object.
 
-If I could find a good way to write these data types with FDHANDLER without passing a DATA object, I wouln't need DATA objects to know if the address they keep are local variables or dynamically allocated addresses.
+If I could find a good way to write these data types with FDHANDLER without passing a DATA 
+object, I wouln't need DATA objects to know if the address they keep are local variables or
+dynamically allocated addresses.
 
-One solution may be refactor save() and append() FDHANDLER functions in order to write polimorfic versions of them for each data type. Or I could use C++ templates.
+One solution may be refactor save() and append() FDHANDLER functions in order to write 
+polimorfic versions of them for each data type. Or I could use C++ templates.

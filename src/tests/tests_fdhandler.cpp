@@ -67,3 +67,24 @@ void test_fdhandler_append(string targetfile){
     delete fd;
     delete result;
 }
+
+void test_fdhandler__write(string targetfile){
+    cout << "Testing FDHANDLER::_write()" << endl << endl;
+    FDHANDLER *fd = new FDHANDLER(targetfile);
+    string s = "Test passed: ";
+    fd->_write((char *)s.c_str(),14,false);
+    int i = 220;
+    fd->_write((char *)&i,sizeof(int),true);
+    DATA *result = new DATA(true);
+    fd->readchk(result, 0, 14);
+    string r = (char *)result->data;
+    fd->readchk(result, 14, 4);
+    int *j = (int *)result->data;
+    i = *j;
+    cout << r << endl;
+    assert(!r.compare("Test passed: "));
+    assert(i == 220);
+    cout << "Test passed!" << endl;
+    delete fd;
+    delete result;
+}

@@ -98,5 +98,7 @@ class FDHANDLER {
     private:
     bool _error;
     void resetcwd(char *wd);
+    public:
+    void _write(char *data, unsigned long size, bool append);
 };
 #endif //_FDHANDLER_HPP
