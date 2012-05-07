@@ -12,13 +12,9 @@ class DATA {
 public:
     void *data; /* place where data is located */
     unsigned long size; /* size of data */
-    DATA(bool dynamic);
-    DATA(void *address, unsigned long size, bool dynamic);
+    DATA();
+    DATA(void *address, unsigned long size);
     ~DATA();
-
-private:
-    bool isDynAlloc;
-
 };
 
 /**

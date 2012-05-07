@@ -15,23 +15,19 @@
 
 using namespace std;
 
-DATA::DATA(bool dynamic){
+DATA::DATA(){
     data = NULL;
     size = 0;
-    isDynAlloc = dynamic;
 }
 
-DATA::DATA(void *address, unsigned long size, bool dynamic){
+DATA::DATA(void *address, unsigned long size){
     data = address;
     this->size = size;
-    isDynAlloc = dynamic;
 }
 
 DATA::~DATA(){
-    if(isDynAlloc){
-        char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
-        delete[] ptr;
-    }
+    char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
+    delete[] ptr;
 }
 
 FDHANDLER::FDHANDLER(string filepath){
