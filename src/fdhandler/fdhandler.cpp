@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#ifdef __unix__
+#if defined (__unix__) || (__APPLE__)
 #include <unistd.h>
 #endif
 
@@ -52,8 +52,8 @@ FDHANDLER &FDHANDLER::readall(DATA *filedata){
 
     char *wd = NULL;
     /* Get the current working directory */
-#ifdef __unix__
-    wd = get_current_dir_name();
+#if defined (__unix__) || (__APPLE__)
+    wd = getcwd(NULL,0);
 #endif
 #ifdef _WIN32
     wd = _getcwd(NULL, 0);
@@ -61,7 +61,7 @@ FDHANDLER &FDHANDLER::readall(DATA *filedata){
 
     if(path.compare(filename) != 0){ //Returns 0 if true.
     /* change dir to path*/
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
         if(chdir(path.c_str()) < 0){
             perror(path.c_str());
             this->_error = true;
@@ -102,7 +102,7 @@ FDHANDLER &FDHANDLER::readall(DATA *filedata){
     fs.read((char*)filedata->data, filesize);
     filedata->size = fs.gcount();
     fs.close();
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
     chdir(wd);
 #endif
 #ifdef _WIN32
@@ -120,7 +120,7 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
     int ssplitp; /* position where the filepath will be splitted */
 
 	//folder separator changes from unix to windows
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
     char separator = '/';
 #endif
 #ifdef _WIN32
@@ -132,8 +132,8 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
 
     char *wd = NULL;
     /* Get the current working directory */
-#ifdef __unix__
-    wd = get_current_dir_name();
+#if defined (__APPLE__) || (__unix__)
+    wd = getcwd(NULL, 0);
 #endif
 #ifdef _WIN32
     wd = _getcwd(NULL, 0);
@@ -145,7 +145,7 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
          */
     if(path.compare(filename) != 0){ //Returns 0 if true.
     /* change dir to path*/
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
         if(chdir(path.c_str()) < 0){
             perror(path.c_str());
             this->_error = true;
@@ -181,7 +181,7 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
     fs.read((char*)filedata->data, size);
     filedata->size = fs.gcount();
     fs.close();
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
     chdir(wd);
 #endif
 #ifdef _WIN32
@@ -227,7 +227,7 @@ void FDHANDLER::_write(char *data, unsigned long size, bool append){
     int ssplitp; /* position where the filepath will be splitted */
 
     //folder separator changes from unix to windows
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
     char separator = '/';
 #endif
 #ifdef _WIN32
@@ -239,8 +239,8 @@ void FDHANDLER::_write(char *data, unsigned long size, bool append){
 
     char *wd = NULL;
     /* Get the current working directory */
-#ifdef __unix__
-    wd = get_current_dir_name();
+#if defined (__APPLE__) || (__unix__)
+    wd = getcwd(NULL, 0);
 #endif
 #ifdef _WIN32
     wd = _getcwd(NULL, 0);
@@ -252,7 +252,7 @@ void FDHANDLER::_write(char *data, unsigned long size, bool append){
          */
     if(path.compare(filename) != 0){ //Returns 0 if true.
     /* change dir to path*/
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
         if(chdir(path.c_str()) < 0){
             perror(path.c_str());
             this->_error = true;
@@ -288,7 +288,7 @@ void FDHANDLER::_write(char *data, unsigned long size, bool append){
 
     fs.close();
 
-#ifdef __unix__
+#if defined (__APPLE__) || (__unix__)
     chdir(wd);
 #endif
 #ifdef _WIN32
