@@ -1,5 +1,5 @@
-#ifndef _FDHANDLER_HPP
-#define _FDHANDLER_HPP
+#ifndef _FDHandler_HPP
+#define _FDHandler_HPP
 
 /**
  * \brief The DATA class represents a chunk of data retrieved from a file.
@@ -22,61 +22,61 @@ public:
  * Works using DATA objects to return the data retrieved and to write data
  * to a file.
  */
-class FDHANDLER {
+class FDHandler {
     public:
     std::string filepath;
     
-    FDHANDLER(std::string filepath);
+    FDHandler(std::string filepath);
     
     /**
      * \brief Loads the entire file and stores its data in the DATA structure given at filedata.
      *
-     * \details First attepts to read the whole file specified in FDHANDLER::filepath. If it
+     * \details First attepts to read the whole file specified in FDHandler::filepath. If it
      * succeded, stores its data in the DATA object given at filedata.
-     * In case an error happened, FDHANDLER::error() returns true.
+     * In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHANDLER &readall(DATA *filedata);
+    FDHandler &readall(DATA *filedata);
     
     /**
      * \brief Loads only a chunk of the file of 'size' bytes from
      * the position at 'offset'.
      *
-     * \details First attepts to read the whole file specified in FDHANDLER::filepath. If it
+     * \details First attepts to read the whole file specified in FDHandler::filepath. If it
      * succeded, stores the read data into the DATA object given at 'filedata'.
-     * In case an error happened, FDHANDLER::error() returns true.
+     * In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHANDLER &readchk(DATA *filedata, unsigned long offset, unsigned long size);
+    FDHandler &readchk(DATA *filedata, unsigned long offset, unsigned long size);
     
     /**
      * \brief Writes the data stored in the object given at 'data' into the file specified
-     * in FDHANDLER::filepath.
+     * in FDHandler::filepath.
      *
      * \details Writes the data stored in the object given at 'data' into the file specified
-     * in FDHANDLER::filepath. In case an error happened, FDHANDLER::error() returns true.
+     * in FDHandler::filepath. In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHANDLER &write(DATA *data);
+    FDHandler &write(DATA *data);
     
     /**
      * \brief Writes the data stored in the object given at 'data' into the end of the file 
-     * specified in FDHANDLER::filepath.
+     * specified in FDHandler::filepath.
      *
      * \details Writes the data stored in the object given at 'data' into the end of the file 
-     * specified in FDHANDLER::filepath. In case an error happened, FDHANDLER::error() 
+     * specified in FDHandler::filepath. In case an error happened, FDHandler::error()
      * returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHANDLER &append(DATA *data);
+    FDHandler &append(DATA *data);
     
-    FDHANDLER &write(char *data, unsigned long size);
-    FDHANDLER &append(char *data, unsigned long size);
+    FDHandler &write(char *data, unsigned long size);
+    FDHandler &append(char *data, unsigned long size);
 
     /**
      * \brief Tells if the object is in error state.
      *
-     * \details A FDHANDLER object is in error state if a problem happened during the execution
+     * \details A FDHandler object is in error state if a problem happened during the execution
      * of one of its file IO methods. For instance, if a problem happened because it could not find
      * the file required for a read or write operation, this method would return true.
      * \return False if the object is new, or none of the operations done has failed. True if some
@@ -87,7 +87,7 @@ class FDHANDLER {
     /**
      * \brief Operator ! overload.
      *
-     * \details Works the same way as the FDHANDLER::error() method, so the expression:
+     * \details Works the same way as the FDHandler::error() method, so the expression:
      * "if(!object)" will be evaluated like "if(object->error())".
      * \return False if the object is new, or none of the operations done has failed. True if some
      * of the operations done has failed.
@@ -99,4 +99,4 @@ class FDHANDLER {
     void resetcwd(char *wd);
     void _write(char *data, unsigned long size, bool append);
 };
-#endif //_FDHANDLER_HPP
+#endif //_FDHandler_HPP

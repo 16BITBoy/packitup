@@ -8,7 +8,7 @@ using namespace std;
 
 /* Manual test for readall function */
 void test_fdhandler_readall(string file){ //Needs an actual file to test
-    FDHANDLER fd(file);
+    FDHandler fd(file);
     DATA *filedata = new DATA();
     fd.readall(filedata);
     assert(filedata != NULL);
@@ -24,7 +24,7 @@ void test_fdhandler_readall(string file){ //Needs an actual file to test
 
 /* Manual test for readall function */
 void test_fdhandler_readchk(string file, unsigned long offset, unsigned long size){//Needs actual file to test
-    FDHANDLER fd(file);
+    FDHandler fd(file);
     DATA *filedata = new DATA();
     fd.readchk(filedata, offset, size);
     assert(filedata != NULL);
@@ -40,9 +40,9 @@ void test_fdhandler_readchk(string file, unsigned long offset, unsigned long siz
 
 /* Manual test for write function */
 void test_fdhandler_write(string outfile){//output filename
-    cout << "Testing FDHANDLER::write(DATA *)" << endl;
+    cout << "Testing FDHandler::write(DATA *)" << endl;
     cout << "---------------------------------" << endl;
-    FDHANDLER fd(outfile);
+    FDHandler fd(outfile);
     DATA *outbuffer = new DATA(new char[1024], 1024);
     unsigned long i;
     char *c;
@@ -65,9 +65,9 @@ void test_fdhandler_write(string outfile){//output filename
 }
 
 void test_fdhandler_write2(string outfile){//output filename
-    cout << "Testing FDHANDLER::write(char *, unsigned long)" << endl;
+    cout << "Testing FDHandler::write(char *, unsigned long)" << endl;
     cout << "---------------------------------" << endl;
-    FDHANDLER fd(outfile);
+    FDHandler fd(outfile);
     unsigned long i;
     char *c = new char[1024];
     for(i = 0; i < 1024; i++){
@@ -88,9 +88,9 @@ void test_fdhandler_write2(string outfile){//output filename
 }
 
 void test_fdhandler_append(string targetfile){
-    cout << "Testing FDHANDLER::append(DATA *)" << endl;
+    cout << "Testing FDHandler::append(DATA *)" << endl;
     cout << "---------------------------------" << endl;
-    FDHANDLER *fd = new FDHANDLER(targetfile);
+    FDHandler *fd = new FDHandler(targetfile);
     string *s = new string();
     *s = "Test passed: ";
     fd->write(new DATA((void *)s->c_str(),13));
@@ -110,9 +110,9 @@ void test_fdhandler_append(string targetfile){
 }
 
 void test_fdhandler_append2(string targetfile){
-    cout << "Testing FDHANDLER::append(char *, unsigned long)" << endl;
+    cout << "Testing FDHandler::append(char *, unsigned long)" << endl;
     cout << "---------------------------------" << endl;
-    FDHANDLER *fd = new FDHANDLER(targetfile);
+    FDHandler *fd = new FDHandler(targetfile);
     string s = "Test passed: ";
     fd->write((char *)s.c_str(),14);
     int i = 220;

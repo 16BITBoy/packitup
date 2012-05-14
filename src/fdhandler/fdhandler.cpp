@@ -30,16 +30,16 @@ DATA::~DATA(){
     delete[] ptr;
 }
 
-FDHANDLER::FDHANDLER(string filepath){
+FDHandler::FDHandler(string filepath){
     this->filepath.append(filepath);
     this->_error = false;
 }
 
-bool FDHANDLER::error(){
+bool FDHandler::error(){
     return this->_error;
 }
 
-FDHANDLER &FDHANDLER::readall(DATA *filedata){
+FDHandler &FDHandler::readall(DATA *filedata){
     if(!this->filepath.compare("") || this->filepath.empty()){ /* filepath not specified */
         this->_error = true;
         return *this;
@@ -111,7 +111,7 @@ FDHANDLER &FDHANDLER::readall(DATA *filedata){
     return *this;
 }
 
-FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned long size){
+FDHandler &FDHandler::readchk(DATA *filedata, unsigned long offset, unsigned long size){
     if(!this->filepath.compare("") || this->filepath.empty()){
         this->_error = true;
         return *this;
@@ -194,31 +194,31 @@ FDHANDLER &FDHANDLER::readchk(DATA *filedata, unsigned long offset, unsigned lon
     return *this;
 }
 
-FDHANDLER& FDHANDLER::write(DATA *data){
+FDHandler& FDHandler::write(DATA *data){
     _write((char *)data->data, data->size, false);
     return *this;
 }
 
-FDHANDLER& FDHANDLER::append(DATA *data){
+FDHandler& FDHandler::append(DATA *data){
     _write((char *)data->data, data->size, true);
     return *this;
 }
 
-FDHANDLER &FDHANDLER::write(char *data, unsigned long size){
+FDHandler &FDHandler::write(char *data, unsigned long size){
     _write(data, size, false);
     return *this;
 }
 
-FDHANDLER &FDHANDLER::append(char *data, unsigned long size){
+FDHandler &FDHandler::append(char *data, unsigned long size){
     _write(data, size, true);
     return *this;
 }
 
-bool FDHANDLER::operator!(){
+bool FDHandler::operator!(){
     return this->error();
 }
 
-void FDHANDLER::_write(char *data, unsigned long size, bool append){
+void FDHandler::_write(char *data, unsigned long size, bool append){
     if(!this->filepath.compare("") || this->filepath.empty()){
         this->_error = true;
         return;

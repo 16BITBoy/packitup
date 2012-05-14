@@ -9,9 +9,7 @@
 
 using namespace std;
 
-class
-
 int main(int argc, char **argv){
-
+    testsuite_fdhandler();
     return 0;
 }
