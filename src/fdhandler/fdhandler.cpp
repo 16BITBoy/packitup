@@ -15,17 +15,17 @@
 
 using namespace std;
 
-DATA::DATA(){
+Data::Data(){
     data = NULL;
     size = 0;
 }
 
-DATA::DATA(void *address, unsigned long size){
+Data::Data(void *address, unsigned long size){
     data = address;
     this->size = size;
 }
 
-DATA::~DATA(){
+Data::~Data(){
     char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
     delete[] ptr;
 }
@@ -39,7 +39,7 @@ bool FDHandler::error(){
     return this->_error;
 }
 
-FDHandler &FDHandler::readall(DATA *filedata){
+FDHandler &FDHandler::readall(Data *filedata){
     if(!this->filepath.compare("") || this->filepath.empty()){ /* filepath not specified */
         this->_error = true;
         return *this;
@@ -111,7 +111,7 @@ FDHandler &FDHandler::readall(DATA *filedata){
     return *this;
 }
 
-FDHandler &FDHandler::readchk(DATA *filedata, unsigned long offset, unsigned long size){
+FDHandler &FDHandler::readchk(Data *filedata, unsigned long offset, unsigned long size){
     if(!this->filepath.compare("") || this->filepath.empty()){
         this->_error = true;
         return *this;
@@ -194,12 +194,12 @@ FDHandler &FDHandler::readchk(DATA *filedata, unsigned long offset, unsigned lon
     return *this;
 }
 
-FDHandler& FDHandler::write(DATA *data){
+FDHandler& FDHandler::write(Data *data){
     _write((char *)data->data, data->size, false);
     return *this;
 }
 
-FDHandler& FDHandler::append(DATA *data){
+FDHandler& FDHandler::append(Data *data){
     _write((char *)data->data, data->size, true);
     return *this;
 }

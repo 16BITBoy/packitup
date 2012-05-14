@@ -2,24 +2,24 @@
 #define _FDHandler_HPP
 
 /**
- * \brief The DATA class represents a chunk of data retrieved from a file.
+ * \brief The Data class represents a chunk of data retrieved from a file.
  * 
- * \details The DATA class consists in a pointer of no type (void type) 
+ * \details The Data class consists in a pointer of no type (void type)
  * and a size field of type unsigned long, with the size of the chunk in
  * bytes.
  */
-class DATA {
+class Data {
 public:
     void *data; /* place where data is located */
     unsigned long size; /* size of data */
-    DATA();
-    DATA(void *address, unsigned long size);
-    ~DATA();
+    Data();
+    Data(void *address, unsigned long size);
+    ~Data();
 };
 
 /**
  * \brief This class allows fast coding of file data reading and writing.
- * Works using DATA objects to return the data retrieved and to write data
+ * Works using Data objects to return the data retrieved and to write data
  * to a file.
  */
 class FDHandler {
@@ -29,25 +29,25 @@ class FDHandler {
     FDHandler(std::string filepath);
     
     /**
-     * \brief Loads the entire file and stores its data in the DATA structure given at filedata.
+     * \brief Loads the entire file and stores its data in the Data structure given at filedata.
      *
      * \details First attepts to read the whole file specified in FDHandler::filepath. If it
-     * succeded, stores its data in the DATA object given at filedata.
+     * succeded, stores its data in the Data object given at filedata.
      * In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHandler &readall(DATA *filedata);
+    FDHandler &readall(Data *filedata);
     
     /**
      * \brief Loads only a chunk of the file of 'size' bytes from
      * the position at 'offset'.
      *
      * \details First attepts to read the whole file specified in FDHandler::filepath. If it
-     * succeded, stores the read data into the DATA object given at 'filedata'.
+     * succeded, stores the read data into the Data object given at 'filedata'.
      * In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHandler &readchk(DATA *filedata, unsigned long offset, unsigned long size);
+    FDHandler &readchk(Data *filedata, unsigned long offset, unsigned long size);
     
     /**
      * \brief Writes the data stored in the object given at 'data' into the file specified
@@ -57,7 +57,7 @@ class FDHandler {
      * in FDHandler::filepath. In case an error happened, FDHandler::error() returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHandler &write(DATA *data);
+    FDHandler &write(Data *data);
     
     /**
      * \brief Writes the data stored in the object given at 'data' into the end of the file 
@@ -68,7 +68,7 @@ class FDHandler {
      * returns true.
      * \return The instance of the object that called its method.
      * */
-    FDHandler &append(DATA *data);
+    FDHandler &append(Data *data);
     
     FDHandler &write(char *data, unsigned long size);
     FDHandler &append(char *data, unsigned long size);
