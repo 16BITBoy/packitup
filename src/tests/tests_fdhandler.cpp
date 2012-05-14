@@ -129,3 +129,11 @@ void test_fdhandler_append2(string targetfile){
     delete fd;
     delete result;
 }
+
+void testsuite_fdhandler(){
+    test_fdhandler_append("testfile");
+    test_fdhandler_append2("testfile");
+    test_fdhandler_write("testfile");
+    test_fdhandler_write2("testfile");
+    cout << "All tests passed." << endl;
+}
