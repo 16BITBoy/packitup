@@ -14,6 +14,7 @@ public:
     unsigned long size; /* size of data */
     Data();
     Data(void *address, unsigned long size);
+    void free();
     ~Data();
 };
 

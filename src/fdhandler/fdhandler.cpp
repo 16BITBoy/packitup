@@ -26,6 +26,11 @@ Data::Data(void *address, unsigned long size){
 }
 
 Data::~Data(){
+    this->free();
+}
+
+void Data::free(){
+    size = 0;
     char *ptr = (char *) this->data; //cast to char* in order to delete that pointer
     delete[] ptr;
 }
