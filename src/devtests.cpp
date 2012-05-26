@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <boost/filesystem.hpp>
 
-#include "../fdhandler/fdhandler.hpp"
+#include "fdhandler/fdhandler.hpp"
 
 namespace PIU{
 
@@ -235,20 +235,20 @@ std::vector<FileInfo> PIUArchive::listFiles(){
 }
 
 int main(int argc, char **argv){
-    /*PIU::PIUArchive *ar = NULL;
+    PIU::PIUArchive *ar = NULL;
     try{
         ar = new PIU::PIUArchive("modelo");
     }
     catch(PIU::PIUArchiveException &e){
-        cout << e.what() << endl;
+        std::cout << e.what() << std::endl;
     }
-    vector<PIU::FileInfo> fileList = ar->listFiles();
+    std::vector<PIU::FileInfo> fileList = ar->listFiles();
     int i;
-    cout << "File information read from original PIU archive:" << endl;
+    std::cout << "File information read from original PIU archive:" << std::endl;
     for(i = 0; i < fileList.size(); i++){
-        cout << fileList[i].fileName << " : " << fileList[i].fileSize << endl;
+        std::cout << fileList[i].fileName << " : " << fileList[i].fileSize << std::endl;
     }
     ar->write();
-*/
+
     return 0;
 }
