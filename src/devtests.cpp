@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <boost/filesystem.hpp>
 
 #include "fdhandler/fdhandler.hpp"
 #include "tests/test_data.cpp"
@@ -11,6 +12,8 @@
 
 using namespace std;
 
+
+namespace PIU{
 /** DRAFT: In design process **/
 
 typedef unsigned int FileListSize;
@@ -20,12 +23,17 @@ typedef unsigned int FileNameLength;
 class FileInfo{
 public:
     FileInfo(){};
+    // PIU File format fields
     string fileName;
     FileSize fileSize;
+
+    // Not from PIU file
+    bool write; // Will be written in new version of this archive.
 };
 
 class PIUHeader{
 public:
+    // PIU File format fields
     FileListSize fileListSize;
     vector<FileInfo> fileList;
 };
@@ -70,7 +78,15 @@ public:
 
 PIUArchive::PIUArchive(string fileName) throw (PIUArchiveException,
                                                InvalidSignatureException){
+    using boost::filesystem::exists;
+    using boost::filesystem::path;
     this->fileName = fileName;
+    path pathToPIUArchive(fileName.c_str());
+
+    if(!exists(pathToPIUArchive)){
+        return; // This will be a new file. Read nothing.
+    }
+
     FDHandler fd(fileName);
 
     //Check archive format signature
@@ -120,26 +136,45 @@ PIUArchive::PIUArchive(string fileName) throw (PIUArchiveException,
 
 }
 
+// TODO
+void PIUArchive::write(){
+    using boost::filesystem::exists;
+    using boost::filesystem::path;
+    string tmpFileName = this->fileName + ".tmp";
+    FDHandler fNew(tmpFileName);
+    FDHandler fOld(this->fileName);
+    PIUArchive *oldPIUAr = NULL;
+    path oldPIUArPath(this->fileName.c_str());
+
+    if(exists(oldPIUArPath)){
+        oldPIUAr = new PIUArchive(this->fileName);
+
+    }
+
+
+}
+
 vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;
 }
 /** END DRAFT **/
-
+}
 
 
 int main(int argc, char **argv){
-    PIUArchive *ar = NULL;
+    PIU::PIUArchive *ar = NULL;
     try{
-        ar = new PIUArchive("modelo");
+        ar = new PIU::PIUArchive("modelo");
     }
-    catch(PIUArchiveException &e){
+    catch(PIU::PIUArchiveException &e){
         cout << e.what() << endl;
     }
-    vector<FileInfo> files = ar->listFiles();
+    vector<PIU::FileInfo> files = ar->listFiles();
     int i;
     for(i = 0; i < files.size(); i++){
         cout << files[i].fileName << "  " << files[i].fileSize << endl;
     }
+    ar->write();
     cout << "Ejecución finalizada." << endl;
     return 0;
 }
