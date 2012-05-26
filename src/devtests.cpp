@@ -26,9 +26,6 @@ public:
     // PIU File format fields
     string fileName;
     FileSize fileSize;
-
-    // Not from PIU file
-    bool write; // Will be written in new version of this archive.
 };
 
 class PIUHeader{
