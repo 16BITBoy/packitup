@@ -4,27 +4,27 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <iomanip>
 #include <boost/filesystem.hpp>
 
-#include "fdhandler/fdhandler.hpp"
-#include "tests/test_data.cpp"
-#include "tests/tests_fdhandler.cpp"
-
-using namespace std;
-
+#include "../fdhandler/fdhandler.hpp"
 
 namespace PIU{
+
 /** DRAFT: In design process **/
 
 typedef unsigned int FileListSize;
 typedef unsigned long int FileSize;
 typedef unsigned int FileNameLength;
 
+const unsigned int SIGNATURE_SIZE = 3;
+std::string SIGNATURE = "PIU";
+
 class FileInfo{
 public:
     FileInfo(){};
     // PIU File format fields
-    string fileName;
+    std::string fileName;
     FileSize fileSize;
 };
 
@@ -32,10 +32,10 @@ class PIUHeader{
 public:
     // PIU File format fields
     FileListSize fileListSize;
-    vector<FileInfo> fileList;
+    std::vector<FileInfo> fileList;
 };
 
-class PIUArchiveException : public exception{
+class PIUArchiveException : public std::exception{
 public:
     const char* what() const throw()
     {
@@ -51,29 +51,56 @@ public:
     }
 };
 
+class PIUArchiveDoesNotExists : public PIUArchiveException{
+    const char* what() const throw(){
+        return "PIU archive doesn't exists.";
+    }
+};
+
+class Operations{
+public:
+    std::vector<std::string> newFiles; // New files to be written into the new PIU archive.
+    std::vector<bool> filesKept; /* Files to be written from the old PIU archive to the new one.
+                               The position of every boolean value in the vector corresponds
+                               to the position of every file in the old PIU archive.
+                            */
+};
+
+
 // Top level class PIUArchive.
 class PIUArchive{
 private:
-    string fileName;
+    std::string fileName;
     PIUHeader headerInfo;
-    vector<Data> fileData;
+    std::vector<Data> fileData;
+    Operations ops; // Operations to be done in this PIU archive.
+    unsigned long int getFileOffset(int position);
 public:
     /** \brief Specifies the file to work with and loads the header information **/
-    PIUArchive(string fileName) throw(PIUArchiveException,
+    PIUArchive(std::string fileName) throw(PIUArchiveException,
                                       InvalidSignatureException);
     /** \brief Returns a vector with the information about the files in the archive **/
-    vector<FileInfo> listFiles();
+    std::vector<FileInfo> listFiles();
     /** \brief Dumps changes to the file on disk. **/
-    void write();
+    void write() throw(PIUArchiveException,
+                       PIUArchiveDoesNotExists);
     /** \brief Adds a new file to the archive in memory (just adds the header information to the file in memory) **/
-    void addFile(string fileName);
+    void addFile(std::string fileName);
     /** \brief Deletes a file from the archive in memory (just deletes the header information to the file in memory) **/
-    void deleteFile(string fileName);
+    void deleteFile(std::string fileName);
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
-    void extractFile(string fileName, string extractPath);
+    void extractFile(std::string fileName, std::string extractPath);
 };
+}
 
-PIUArchive::PIUArchive(string fileName) throw (PIUArchiveException,
+
+
+
+
+namespace PIU{
+
+
+PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
                                                InvalidSignatureException){
     using boost::filesystem::exists;
     using boost::filesystem::path;
@@ -89,7 +116,7 @@ PIUArchive::PIUArchive(string fileName) throw (PIUArchiveException,
     //Check archive format signature
     Data *inBuf = new Data();
     fd.readchk(inBuf, 0, 3);
-    string signature;
+    std::string signature;
     int i;
     char *c = NULL;
     for(i = 0; i < 3; i++){
@@ -129,49 +156,99 @@ PIUArchive::PIUArchive(string fileName) throw (PIUArchiveException,
         fInfo.fileSize = *(FileSize *)(buffer + bytesRead);
         bytesRead += sizeof(FileSize);
         this->headerInfo.fileList.push_back(fInfo);
+        this->ops.filesKept.push_back(true);
     }
 
 }
 
+unsigned long int PIUArchive::getFileOffset(int position){
+    FileSize offInFileDataSpace = 0;
+    FileListSize i;
+    for(i = 0; i < position; i++){
+        offInFileDataSpace += this->headerInfo.fileList[i].fileSize;
+    }
+    return SIGNATURE_SIZE + sizeof(FileListSize) + this->headerInfo.fileListSize + offInFileDataSpace;
+}
+
 // TODO
-void PIUArchive::write(){
+void PIUArchive::write() throw(PIUArchiveException,
+                               PIUArchiveDoesNotExists){
     using boost::filesystem::exists;
     using boost::filesystem::path;
-    string tmpFileName = this->fileName + ".tmp";
+    std::string tmpFileName = this->fileName + ".tmp";
     FDHandler fNew(tmpFileName);
     FDHandler fOld(this->fileName);
     PIUArchive *oldPIUAr = NULL;
     path oldPIUArPath(this->fileName.c_str());
 
-    if(exists(oldPIUArPath)){
-        oldPIUAr = new PIUArchive(this->fileName);
-
+    /* Writing new PIU archive header
+     */
+    fNew.write((char *)SIGNATURE.c_str(), 3);
+    fNew.append((char *)&this->headerInfo.fileListSize, sizeof(FileListSize));
+    int i;
+    for(i = 0; i < this->headerInfo.fileList.size(); i++){
+        FileNameLength fnl = this->headerInfo.fileList[i].fileName.length();
+        fNew.append((char *)&fnl, sizeof(FileNameLength));
+        fNew.append((char *)this->headerInfo.fileList[i].fileName.c_str(), this->headerInfo.fileList[i].fileName.length());
+        fNew.append((char *)&this->headerInfo.fileList[i].fileSize, sizeof(FileSize));
     }
+
+    /* Writing file data
+     */
+    Data *buf = new Data();
+    // If this is not a new PIU file, copy the files
+    // to be kept from the old version to the new one of the PIU Archive.
+    if(this->ops.filesKept.size() > 0){
+        if(!exists(oldPIUArPath))
+            throw PIUArchiveDoesNotExists();
+        oldPIUAr = new PIUArchive(this->fileName);
+        for(i=0; i<ops.filesKept.size(); i++){
+            if(ops.filesKept[i]){
+                FileSize oldOff = oldPIUAr->getFileOffset(i);
+                // DEBUG: cout << "File data is at address :" << hex << oldOff << endl;
+                if(!fOld.readchk(buf, oldOff, oldPIUAr->headerInfo.fileList[i].fileSize))
+                    throw PIUArchiveException();
+                std::cout << std::dec;
+                if(buf->size != oldPIUAr->headerInfo.fileList[i].fileSize){
+                    std::cout << "ERROR: " << std::dec << buf->size << " bytes read from old PIU file. "
+                         << headerInfo.fileList[i].fileSize - buf->size << " bytes missing."
+                         << std::endl;
+                    throw PIUArchiveException();
+                }
+                std::cout << buf->size << " bytes successfully read from old PIU file." << std::endl;
+                if(!fNew.append(buf)){
+                    throw PIUArchiveException();
+                }
+                buf->free();
+            }
+        }
+    }
+    // TODO: Write the new files into the archive.
 
 
 }
 
-vector<FileInfo> PIUArchive::listFiles(){
+std::vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;
 }
 /** END DRAFT **/
 }
 
-
 int main(int argc, char **argv){
-    PIU::PIUArchive *ar = NULL;
+    /*PIU::PIUArchive *ar = NULL;
     try{
         ar = new PIU::PIUArchive("modelo");
     }
     catch(PIU::PIUArchiveException &e){
         cout << e.what() << endl;
     }
-    vector<PIU::FileInfo> files = ar->listFiles();
+    vector<PIU::FileInfo> fileList = ar->listFiles();
     int i;
-    for(i = 0; i < files.size(); i++){
-        cout << files[i].fileName << "  " << files[i].fileSize << endl;
+    cout << "File information read from original PIU archive:" << endl;
+    for(i = 0; i < fileList.size(); i++){
+        cout << fileList[i].fileName << " : " << fileList[i].fileSize << endl;
     }
     ar->write();
-    cout << "Ejecución finalizada." << endl;
+*/
     return 0;
 }
