@@ -10,7 +10,7 @@
 #include <vector>
 #include "../fdhandler/fdhandler.hpp"
 
-//namespace PIU{
+namespace PIU{
 typedef unsigned int FileListSize;
 typedef unsigned long int FileSize;
 typedef unsigned int FileNameLength;
@@ -89,6 +89,6 @@ public:
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
     void extractFile(std::string fileName, std::string extractPath);
 };
-////}
+}
 
 #endif /* _PIU_HPP_ */

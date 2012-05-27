@@ -12,7 +12,7 @@
 
 #include "piu.hpp"
 
-//namespace PIU{
+namespace PIU{
 
 PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
                                                InvalidSignatureException){
@@ -145,4 +145,4 @@ std::vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;
 }
 /** END DRAFT **/
-//} // end namespace PIU
+} // end namespace PIU

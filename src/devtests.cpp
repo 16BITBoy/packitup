@@ -4,7 +4,7 @@
 #include "fdhandler/fdhandler.hpp"
 #include "piu/piu.hpp"
 
-
+using namespace PIU;
 int main(int argc, char **argv){
     PIUArchive *ar = NULL;
     try{
