@@ -20,7 +20,6 @@ int main(int argc, char **argv){
         std::cout << fileList[i].fileName << " : " << fileList[i].fileSize << std::endl;
     }
     ar->write();
-    std::cout << "" << std::endl;
 
     return 0;
 }
