@@ -9,6 +9,10 @@ find_package(Boost 1.49.0 COMPONENTS system filesystem)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
+    if(QTCREATOR)
+        include_directories(SYSTEM "/usr/include/c++/4.6/")
+        message("Regenerating project for QtCreator")
+    endif()
     
     #ADD_LIBRARY(piu STATIC fdhandler/fdhandler.c errors/errors.c piu/piu.c)
     #ADD_LIBRARY(piushared SHARED fdhandler/fdhandler.c errors/errors.c piu/piu.c)

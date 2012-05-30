@@ -2,7 +2,7 @@
  * piu.cpp
  *
  *  Created on: 26/05/2012
- *      Author: adrian
+ *      Author: Adrián Pérez Heredia
  */
 
 #include <boost/filesystem.hpp>
@@ -137,7 +137,18 @@ void PIUArchive::write() throw(PIUArchiveException,
             }
         }
     }
-    // TODO: Write the new files into the archive.
+    // TODO: Test this code.
+    FDHandler *file = NULL;
+    for(i = 0; i < this->ops.newFiles.size(); i++){
+        file = new FDHandler(this->ops.newFiles[i]);
+        if(!file->readall(buf)){
+            throw PIUArchiveException();
+        }
+        fNew.append(buf);
+        buf->free();
+        delete file;
+    }
+
 
 }
 

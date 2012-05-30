@@ -2,7 +2,7 @@
  * piuarchive.hpp
  *
  *  Created on: 26/05/2012
- *      Author: adrian
+ *      Author: Adrián Pérez Heredia
  */
 #ifndef PIU_HPP_
 #define PIU_HPP_
@@ -20,7 +20,6 @@ const std::string PIU_SIGNATURE = "PIU";
 
 class FileInfo{
 public:
-    FileInfo(){};
     // PIU File format fields
     std::string fileName;
     FileSize fileSize;
@@ -72,7 +71,7 @@ private:
     PIUHeader headerInfo;
     std::vector<Data> fileData;
     Operations ops; // Operations to be done in this PIU archive.
-    unsigned long int getFileOffset(int position);
+    unsigned long int getFileOffset(int position); // Get file offset within PIU archive.
 public:
     /** \brief Specifies the file to work with and loads the header information **/
     PIUArchive(std::string fileName) throw(PIUArchiveException,
@@ -89,6 +88,6 @@ public:
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
     void extractFile(std::string fileName, std::string extractPath);
 };
-}
+} /* End of namespace PIU */
 
 #endif /* _PIU_HPP_ */
