@@ -6,8 +6,8 @@
  */
 #ifndef PIU_HPP_
 #define PIU_HPP_
-#include <string>
-#include <vector>
+//#include <string>
+//#include <vector>
 #include "../fdhandler/fdhandler.hpp"
 
 namespace PIU{
@@ -86,6 +86,8 @@ private:
     PIUHeader headerInfo;
     std::vector<Data> fileData;
     Operations ops; // Operations to be done in this PIU archive.
+    boost::unordered::unordered_map<std::string, FileListSize> posMap; // Maps filenames with the position
+                                                              // within the PIU archive.
     unsigned long int getFileOffset(int position); // Get file offset within PIU archive.
 public:
     /** \brief Specifies the file to work with and loads the header information **/

@@ -6,6 +6,7 @@
  */
 
 #include <boost/filesystem.hpp>
+#include <boost/unordered_map.hpp>
 #include <iomanip>
 #include <vector>
 #include <string>
@@ -54,7 +55,7 @@ PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
         throw PIUArchiveException();
     char *buffer = (char *)inBuf->data;
     FileListSize bytesRead = 0;
-
+    FileListSize pos = 0;
     //Read the contents from the file list and store them.
     while(bytesRead < this->headerInfo.fileListSize){
         FileNameLength fnl = *(FileNameLength *)(buffer + bytesRead);
@@ -70,7 +71,12 @@ PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
         fi.fileSize = *(FileSize *)(buffer + bytesRead);
         bytesRead += sizeof(FileSize);
         this->headerInfo.fileList.push_back(fi);
+        // Also, set to true filesKept value so the file will be copied by default
+        // in next version of this PIU archive, unless the opposite is explicitly specified.
         this->ops.filesKept.push_back(true);
+        // Map the filename to the position this file will be kept in the fileList vector.
+        this->posMap[fi.fileName] = pos;
+        ++pos;
     }
 
 }
@@ -84,7 +90,8 @@ unsigned long int PIUArchive::getFileOffset(int position){
     return PIU_SIGNATURE_SIZE + sizeof(FileListSize) + this->headerInfo.fileListSize + offInFileDataSpace;
 }
 
-// TODO
+/* TODO: Calling this function require to update all the header information from the new
+         on disk version */
 void PIUArchive::write() throw(PIUArchiveException,
                                PIUArchiveDoesNotExists){
     using boost::filesystem::exists;
@@ -125,8 +132,8 @@ void PIUArchive::write() throw(PIUArchiveException,
                 std::cout << std::dec;
                 if(buf->size != oldPIUAr->headerInfo.fileList[i].fileSize){
                     std::cout << "ERROR: " << std::dec << buf->size << " bytes read from old PIU file. "
-                         << headerInfo.fileList[i].fileSize - buf->size << " bytes missing."
-                         << std::endl;
+                              << headerInfo.fileList[i].fileSize - buf->size << " bytes missing."
+                              << std::endl;
                     throw PIUArchiveException();
                 }
                 std::cout << buf->size << " bytes successfully read from old PIU file." << std::endl;
@@ -152,9 +159,14 @@ void PIUArchive::write() throw(PIUArchiveException,
 
 }
 
-//void PIUArchive::deleteFile(std::string fileName){
-//    this->headerInfo.fileList.
-//}
+/* TODO: Calling this function will require to recalculate this->headerInfo.fileListSize after
+   the call to keep it updated. */
+void PIUArchive::deleteFile(std::string fileName){
+    FileListSize pos = this->posMap.at(fileName);
+    this->headerInfo.fileList.erase(pos);
+    posMap.erase(fileName);
+    this->ops.filesKept[pos] = false;
+}
 
 std::vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;
