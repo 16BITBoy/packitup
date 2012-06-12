@@ -137,7 +137,7 @@ void PIUArchive::write() throw(PIUArchiveException,
             }
         }
     }
-    // TODO: Test this code.
+    // Copy data from new files into the archive
     FDHandler *file = NULL;
     for(i = 0; i < this->ops.newFiles.size(); i++){
         file = new FDHandler(this->ops.newFiles[i]);
@@ -151,6 +151,10 @@ void PIUArchive::write() throw(PIUArchiveException,
 
 
 }
+
+//void PIUArchive::deleteFile(std::string fileName){
+//    this->headerInfo.fileList.
+//}
 
 std::vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;

@@ -32,6 +32,9 @@ public:
     std::vector<FileInfo> fileList;
 };
 
+/**
+  \brief Exception base class.
+**/
 class PIUArchiveException : public std::exception{
 public:
     const char* what() const throw()
@@ -40,6 +43,9 @@ public:
     }
 };
 
+/**
+  \brief Exception: The PIU archive signature is invalid.
+**/
 class InvalidSignatureException : public PIUArchiveException{
 public:
     const char* what() const throw()
@@ -48,12 +54,18 @@ public:
     }
 };
 
+/**
+  \brief Exception: The PIU archive doesn't exists.
+**/
 class PIUArchiveDoesNotExists : public PIUArchiveException{
     const char* what() const throw(){
         return "PIU archive doesn't exists.";
     }
 };
 
+/**
+  \brief Represents a "ToDo list" with the changes to be done in the contents of the PIU archive.
+**/
 class Operations{
 public:
     std::vector<std::string> newFiles; // New files to be written into the new PIU archive.
@@ -64,7 +76,10 @@ public:
 };
 
 
-// Top level class PIUArchive.
+/**
+  \brief Top level class. Provides methods for all the highest level operations related
+         to a PIU archive.
+**/
 class PIUArchive{
 private:
     std::string fileName;
