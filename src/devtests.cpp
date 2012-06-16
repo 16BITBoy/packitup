@@ -10,7 +10,7 @@ using namespace PIU;
 int main(int argc, char **argv){
     PIUArchive *ar = NULL;
     try{
-        ar = new PIUArchive("modelo.tmp");
+        ar = new PIUArchive("test");
     }
     catch(PIUArchiveException &e){
         std::cout << e.what() << std::endl;
@@ -21,8 +21,8 @@ int main(int argc, char **argv){
     for(i = 0; i < fileList.size(); i++){
         std::cout << fileList[i].fileName << " : " << fileList[i].fileSize << std::endl;
     }
-
-    ar->write();
-
+    //ar->deleteFile("fichero1");
+    //ar->deleteFile("fichero2");
+    //ar->write();
     return 0;
 }

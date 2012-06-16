@@ -15,18 +15,9 @@
 
 namespace PIU{
 
-PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
-                                               InvalidSignatureException){
-    using boost::filesystem::exists;
-    using boost::filesystem::path;
-    this->fileName = fileName;
-    path pathToPIUArchive(fileName.c_str());
-
-    if(!exists(pathToPIUArchive)){
-        return; // This will be a new file. Read nothing.
-    }
-
-    FDHandler fd(fileName);
+void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
+                                       InvalidSignatureException){
+    FDHandler fd(this->fileName);
 
     //Check archive format signature
     Data *inBuf = new Data();
@@ -78,7 +69,26 @@ PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
         this->posMap[fi.fileName] = pos;
         ++pos;
     }
+}
 
+void PIUArchive::updateHeaderInfo() throw(PIUArchiveException,
+                                     InvalidSignatureException){
+    this->headerInfo.fileList.clear();
+    this->headerInfo.fileListSize = 0;
+    getHeaderInfo();
+}
+
+PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
+                                               InvalidSignatureException){
+    using boost::filesystem::exists;
+    using boost::filesystem::path;
+    this->fileName = fileName;
+    path pathToPIUArchive(fileName.c_str());
+
+    if(!exists(pathToPIUArchive)){
+        return; // This will be a new file. Read nothing.
+    }
+    getHeaderInfo();
 }
 
 unsigned long int PIUArchive::getFileOffset(int position){
@@ -155,17 +165,31 @@ void PIUArchive::write() throw(PIUArchiveException,
         buf->free();
         delete file;
     }
-
-
+    // Remove the old file and rename the temp file to the name the old file had.
+    boost::filesystem::remove(oldPIUArPath);
+    boost::filesystem::path tmpFilePath(tmpFileName.c_str());
+    boost::filesystem::rename(tmpFilePath, oldPIUArPath);
+    updateHeaderInfo();
 }
 
 /* TODO: Calling this function will require to recalculate this->headerInfo.fileListSize after
    the call to keep it updated. */
 void PIUArchive::deleteFile(std::string fileName){
     FileListSize pos = this->posMap.at(fileName);
-    this->headerInfo.fileList.erase(pos);
+    this->headerInfo.fileList.erase(this->headerInfo.fileList.begin() + pos);
     posMap.erase(fileName);
     this->ops.filesKept[pos] = false;
+    computeFileListSize();
+}
+
+void PIUArchive::computeFileListSize(){
+    unsigned int fileCount = this->headerInfo.fileList.size();
+    FileListSize totalSize = (sizeof(FileSize) + sizeof(FileNameLength)) * fileCount;
+    int i;
+    for(i = 0; i < this->headerInfo.fileList.size(); i++){
+        totalSize += this->headerInfo.fileList[i].fileName.length();
+    }
+    this->headerInfo.fileListSize = totalSize;
 }
 
 std::vector<FileInfo> PIUArchive::listFiles(){

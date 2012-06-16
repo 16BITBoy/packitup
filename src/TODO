@@ -1,7 +1,0 @@
-Implementing deleteFile().
-
-Seems that calling this function would require to update the in memory filelist size property "PIUArchive::headerInfo.fileListSize".
-
-Also seems that we need to read again all the header information after PIUArchive::write() is called.
-
-I have to think if writing a function that updates the header information from disk (by refactoring PIUArchive constructor) and calling it from write() is a good idea, or may be I should create a higher level layer for the public interface, so a hypothetical higher level deleteFile function would call the actual deleteFile to delete the in memory entries and then update the filelist size, and the same for the header information update issue in write().

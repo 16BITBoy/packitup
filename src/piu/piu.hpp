@@ -89,6 +89,9 @@ private:
     boost::unordered::unordered_map<std::string, FileListSize> posMap; // Maps filenames with the position
                                                               // within the PIU archive.
     unsigned long int getFileOffset(int position); // Get file offset within PIU archive.
+    void getHeaderInfo() throw(PIUArchiveException,
+                               InvalidSignatureException); // Gets header info from file on disk.
+    void computeFileListSize();
 public:
     /** \brief Specifies the file to work with and loads the header information **/
     PIUArchive(std::string fileName) throw(PIUArchiveException,
@@ -104,6 +107,8 @@ public:
     void deleteFile(std::string fileName);
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
     void extractFile(std::string fileName, std::string extractPath);
+    void updateHeaderInfo() throw(PIUArchiveException,
+                                  InvalidSignatureException);
 };
 } /* End of namespace PIU */
 
