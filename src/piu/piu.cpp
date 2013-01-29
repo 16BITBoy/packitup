@@ -205,5 +205,10 @@ void PIUArchive::computeFileListSize(){
 std::vector<FileInfo> PIUArchive::listFiles(){
     return this->headerInfo.fileList;
 }
+
+FileListSize PIUArchive::getFileListSize(){
+    return this->headerInfo.fileListSize;
+}
+
 /** END DRAFT **/
 } // end namespace PIU
