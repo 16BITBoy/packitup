@@ -10,7 +10,7 @@ using namespace PIU;
 int main(int argc, char **argv){
     PIUArchive *ar = NULL;
     try{
-        ar = new PIUArchive("test");
+        ar = new PIUArchive("test.piu");
     }
     catch(PIUArchiveException &e){
         std::cout << e.what() << std::endl;

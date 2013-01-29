@@ -35,6 +35,9 @@ void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
 
     //Read file list size
     inBuf->free();
+
+    /* TODO: This '3' below is the position of the filelistsize in a PIU file
+       Thus, it must be a defined constant. */
     if(!fd.readchk(inBuf, 3, sizeof(FileListSize)))
         throw PIUArchiveException();
     this->headerInfo.fileListSize = *(FileListSize *)inBuf->data;
@@ -42,6 +45,9 @@ void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
     //Read the whole file list and create a pointer "buffer" pointing to the
     //beginning of the list.
     inBuf->free();
+
+    /* TODO: This '7' below is the position of the beginning of the file list
+       Thus, it must be a defined constant. */
     if(!fd.readchk(inBuf, 7, this->headerInfo.fileListSize))
         throw PIUArchiveException();
     char *buffer = (char *)inBuf->data;
@@ -79,9 +85,13 @@ void PIUArchive::updateHeaderInfo() throw(PIUArchiveException,
 }
 
 PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
-                                               InvalidSignatureException){
+                                               InvalidSignatureException,
+                                               PIUArchiveEmptyFileName){
     using boost::filesystem::exists;
     using boost::filesystem::path;
+    if(fileName.empty())
+        throw PIUArchiveEmptyFileName();
+
     this->fileName = fileName;
     path pathToPIUArchive(fileName.c_str());
 

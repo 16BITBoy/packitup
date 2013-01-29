@@ -55,6 +55,17 @@ public:
 };
 
 /**
+  \brief Exception: PIUArchive constructor called with empty string
+**/
+class PIUArchiveEmptyFileName : public PIUArchiveException{
+public:
+    const char* what() const throw()
+    {
+        return "PIUArchive constructor called with empty string";
+    }
+};
+
+/**
   \brief Exception: The PIU archive doesn't exists.
 **/
 class PIUArchiveDoesNotExists : public PIUArchiveException{
@@ -93,12 +104,20 @@ private:
                                InvalidSignatureException); // Gets header info from file on disk.
     void computeFileListSize();
 public:
-    /** \brief Specifies the file to work with and loads the header information **/
+    /**
+     * \brief Specifies the file to work with and if the file exists loads the header information.
+     * @param fileName Name of the file to load, or to be created in case it doesn't exists.
+     * @pre fileName string must not be empty.
+     * @post If the file exist, loads the header information of the file. If it doesn't exists,
+     *       this object remains empty and ready for use as a new PIU file.
+     **/
     PIUArchive(std::string fileName) throw(PIUArchiveException,
-                                      InvalidSignatureException);
+                                      InvalidSignatureException,
+                                      PIUArchiveEmptyFileName);
     /** \brief Returns a vector with the information about the files in the archive **/
     std::vector<FileInfo> listFiles();
     /** \brief Dumps changes to the file on disk. **/
+    FileListSize getFileListSize();
     void write() throw(PIUArchiveException,
                        PIUArchiveDoesNotExists);
     /** \brief Adds a new file to the archive in memory (just adds the header information to the file in memory) **/
