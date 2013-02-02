@@ -34,44 +34,56 @@ public:
 /**
   \brief Exception base class.
 **/
-class PIUArchiveException : public std::exception{
+class PIUArchiveException{
+protected:
+    std::string msg;
+    std::string finalMsg;
 public:
-    const char* what() const throw()
-    {
-        return "Unknown exception while handling PIU archive.";
+    PIUArchiveException(std::string msg){
+        this->msg = msg;
+        buildMsg();
     }
+    virtual void buildMsg(){
+        this->finalMsg = "Error: " + msg + "\n";
+    }
+
+    std::string errorMsg(){ return this->finalMsg; }
 };
+
 
 /**
   \brief Exception: The PIU archive signature is invalid.
 **/
-class InvalidSignatureException : public PIUArchiveException{
+class FileFormatError : public PIUArchiveException{
 public:
-    const char* what() const throw()
-    {
-        return "PIU archive signature invalid.";
+    FileFormatError(std::string msg) : PIUArchiveException(msg){}
+    void buildMsg(){
+        this->finalMsg = "File format error: " + msg + "\n";
     }
 };
 
 /**
   \brief Exception: PIUArchive constructor called with empty string
 **/
-class PIUArchiveEmptyFileName : public PIUArchiveException{
+class BadParameter : public PIUArchiveException{
 public:
-    const char* what() const throw()
-    {
-        return "PIUArchive constructor called with empty string";
+    BadParameter(std::string msg) : PIUArchiveException(msg){}
+    void buildMsg(){
+        this->finalMsg = "Bad parameter value error: " + msg + "\n";
     }
 };
 
 /**
   \brief Exception: The PIU archive doesn't exists.
 **/
-class PIUArchiveDoesNotExists : public PIUArchiveException{
-    const char* what() const throw(){
-        return "PIU archive doesn't exists.";
+class FileNotFound : public PIUArchiveException{
+public:
+    FileNotFound(std::string msg) : PIUArchiveException(msg){}
+    void buildMsg(){
+        this->finalMsg = "File not found : " + msg + "\n";
     }
 };
+
 
 /**
   \brief Represents a "ToDo list" with the changes to be done in the contents of the PIU archive.
@@ -100,7 +112,7 @@ private:
                                                               // within the PIU archive.
     unsigned long int getFileOffset(int position); // Get file offset within PIU archive.
     void getHeaderInfo() throw(PIUArchiveException,
-                               InvalidSignatureException); // Gets header info from file on disk.
+                               FileFormatError); // Gets header info from file on disk.
     void computeFileListSize();
 public:
     /**
@@ -111,22 +123,41 @@ public:
      *       this object remains empty and ready for use as a new PIU file.
      **/
     PIUArchive(std::string fileName) throw(PIUArchiveException,
-                                      InvalidSignatureException,
-                                      PIUArchiveEmptyFileName);
-    /** \brief Returns a vector with the information about the files in the archive **/
+                                           BadParameter);
+    /**
+     * \brief Returns a vector with the information about the files in the archive
+     * @post Returns std::vector<FileInfo> with all the information about the files, if there are any.
+     *       Vector is empty otherwise.
+     **/
     std::vector<FileInfo> listFiles();
-    /** \brief Dumps changes to the file on disk. **/
+
+    /**
+     * @brief Returns the size in bytes of the filelist.
+     * @return Returns a FileListSize value.
+     **/
     FileListSize getFileListSize();
+
+    /**
+     * \brief Dumps changes to the file on disk.
+     * @pre fileName should be a valid one. If not, behaviour is not defined.
+     * @post Writes the changes in a new temporary file, copies data from the old PIU file if there
+     *       was any, then deletes that old file and renames the temporary file to the name specified
+     *       by fileName member.
+     **/
     void write() throw(PIUArchiveException,
-                       PIUArchiveDoesNotExists);
-    /** \brief Adds a new file to the archive in memory (just adds the header information to the file in memory) **/
-    void addFile(std::string fileName);
+                       FileNotFound);
+    /**
+     * \brief Adds a new file to the archive in memory (just adds the header information to the
+     *        file in memory)
+     * @param fileName Name of the file to add.
+     **/
+    void addFile(std::string fileName) throw(PIUArchiveException);
     /** \brief Deletes a file from the archive in memory (just deletes the header information to the file in memory) **/
     void deleteFile(std::string fileName);
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
     void extractFile(std::string fileName, std::string extractPath);
     void updateHeaderInfo() throw(PIUArchiveException,
-                                  InvalidSignatureException);
+                                  FileFormatError);
 };
 } /* End of namespace PIU */
 
