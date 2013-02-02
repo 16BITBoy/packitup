@@ -1,10 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/unordered_map.hpp>
 
-#include "fdhandler/fdhandler.hpp"
-#include "piu/piu.hpp"
+#include "../piu/piu.hpp"
 
 using namespace PIU;
 
@@ -35,3 +33,4 @@ int main(int argc, char **argv){
     showPIUFileInformation(std::string(argv[1]));
     return EXIT_SUCCESS;
 }
+

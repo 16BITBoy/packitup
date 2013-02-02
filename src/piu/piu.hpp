@@ -6,8 +6,7 @@
  */
 #ifndef PIU_HPP_
 #define PIU_HPP_
-//#include <string>
-//#include <vector>
+#include <boost/unordered_map.hpp>
 #include "../fdhandler/fdhandler.hpp"
 
 namespace PIU{

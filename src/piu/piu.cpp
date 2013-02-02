@@ -6,7 +6,6 @@
  */
 
 #include <boost/filesystem.hpp>
-#include <boost/unordered_map.hpp>
 #include <iomanip>
 #include <vector>
 #include <string>
