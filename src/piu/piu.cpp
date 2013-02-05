@@ -12,7 +12,10 @@
 
 #include "piu.hpp"
 
+
 namespace PIU{
+
+/** BEGIN DRAFT **/
 
 void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
                                        FileFormatError){
@@ -208,10 +211,31 @@ std::vector<FileInfo> PIUArchive::listFiles(){
 FileListSize PIUArchive::getFileListSize(){
     return this->headerInfo.fileListSize;
 }
-
-void PIUArchive::addFile(std::string fileName) throw(PIUArchiveException){
+/**
+ * TODO: Store the gatered information in headerInfo. Don't forget to create
+ * the needed entry in posMap.
+ **/
+void PIUArchive::addFile(std::string fileName) throw(PIUArchiveException,
+                                                     FileNotFound,
+                                                     BadParameter){
     if(fileName.empty()){
-        throw PIUArchiveException("Called PIUArchive::addFile() with empty string.");
+        throw BadParameter("Called PIUArchive::addFile() with empty string.");
+    }
+
+    boost::filesystem::path filePath(fileName.c_str());
+    boost::uintmax_t fileSize;
+
+    try{
+        fileSize = boost::filesystem::file_size(filePath);
+    }
+    catch(boost::filesystem::filesystem_error e){
+        throw FileNotFound("File \""+fileName+"\" not found.");
+    }
+
+    if(fileSize < 0){
+        std::ostringstream converter;
+        converter << fileSize;
+        throw PIUArchiveException("Unexpected file size found. Filename: "+fileName+" | File size: "+converter.str());
     }
 
 }
