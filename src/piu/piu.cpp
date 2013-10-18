@@ -17,7 +17,7 @@ namespace PIU{
 
 /** BEGIN DRAFT **/
 
-void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
+void PIUArchive::getHeaderInfo() throw(UndefinedException,
                                        FileFormatError){
     FDHandler fd(this->fileName);
 
@@ -41,7 +41,7 @@ void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
     /* TODO: This '3' below is the position of the filelistsize in a PIU file
        Thus, it must be a defined constant. */
     if(!fd.readchk(inBuf, 3, sizeof(FileListSize)))
-        throw PIUArchiveException("Read error while trying to get the size of the file list.");
+        throw UndefinedException("Read error while trying to get the size of the file list.");
     this->headerInfo.fileListSize = *(FileListSize *)inBuf->data;
 
     //Read the whole file list and create a pointer "buffer" pointing to the
@@ -51,7 +51,7 @@ void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
     /* TODO: This '7' below is the position of the beginning of the file list
        Thus, it must be a defined constant. */
     if(!fd.readchk(inBuf, 7, this->headerInfo.fileListSize))
-        throw PIUArchiveException("Read error while trying to read the information from the file list.");
+        throw UndefinedException("Read error while trying to read the information from the file list.");
     char *buffer = (char *)inBuf->data;
     FileListSize bytesRead = 0;
     FileListSize pos = 0;
@@ -79,14 +79,14 @@ void PIUArchive::getHeaderInfo() throw(PIUArchiveException,
     }
 }
 
-void PIUArchive::updateHeaderInfo() throw(PIUArchiveException,
+void PIUArchive::updateHeaderInfo() throw(UndefinedException,
                                      FileFormatError){
     this->headerInfo.fileList.clear();
     this->headerInfo.fileListSize = 0;
     getHeaderInfo();
 }
 
-PIUArchive::PIUArchive(std::string fileName) throw (PIUArchiveException,
+PIUArchive::PIUArchive(std::string fileName) throw (UndefinedException,
                                                     BadParameter){
     using boost::filesystem::exists;
     using boost::filesystem::path;
@@ -114,7 +114,7 @@ unsigned long int PIUArchive::getFileOffset(int position){
 /* TODO: Calling this function will require to update all the header information from the new
          on disk version
  */
-void PIUArchive::write() throw(PIUArchiveException,
+void PIUArchive::write() throw(UndefinedException,
                                FileNotFound){
     using boost::filesystem::exists;
     using boost::filesystem::path;
@@ -150,17 +150,17 @@ void PIUArchive::write() throw(PIUArchiveException,
                 FileSize oldOff = oldPIUAr->getFileOffset(i);
                 // DEBUG: cout << "File data is at address :" << hex << oldOff << endl;
                 if(!fOld.readchk(buf, oldOff, oldPIUAr->headerInfo.fileList[i].fileSize))
-                    throw PIUArchiveException("Error trying to read file data from PIU archive.");
+                    throw UndefinedException("Error trying to read file data from PIU archive.");
                 std::cout << std::dec;
                 if(buf->size != oldPIUAr->headerInfo.fileList[i].fileSize){
                     std::cout << "ERROR: " << std::dec << buf->size << " bytes read from old PIU file. "
                               << headerInfo.fileList[i].fileSize - buf->size << " bytes missing."
                               << std::endl;
-                    throw PIUArchiveException("Error reading file data. There are bytes missing. Not enough memory perhaps?");
+                    throw UndefinedException("Error reading file data. There are bytes missing. Not enough memory perhaps?");
                 }
                 std::cout << buf->size << " bytes successfully read from old PIU file." << std::endl;
                 if(!fNew.append(buf)){
-                    throw PIUArchiveException("Error trying to write data. Not enough free space on disk perhaps?");
+                    throw UndefinedException("Error trying to write data. Not enough free space on disk perhaps?");
                 }
                 buf->free();
             }
@@ -171,7 +171,7 @@ void PIUArchive::write() throw(PIUArchiveException,
     for(i = 0; i < this->ops.newFiles.size(); i++){
         file = new FDHandler(this->ops.newFiles[i]);
         if(!file->readall(buf)){
-            throw PIUArchiveException("Error reading file \""+this->ops.newFiles[i]+"\".");
+            throw UndefinedException("Error reading file \""+this->ops.newFiles[i]+"\".");
         }
         fNew.append(buf);
         buf->free();
@@ -215,7 +215,7 @@ FileListSize PIUArchive::getFileListSize(){
  * TODO: Store the gatered information in headerInfo. Don't forget to create
  * the needed entry in posMap.
  **/
-void PIUArchive::addFile(std::string fileName) throw(PIUArchiveException,
+void PIUArchive::addFile(std::string fileName) throw(UndefinedException,
                                                      FileNotFound,
                                                      BadParameter){
     if(fileName.empty()){
@@ -235,7 +235,7 @@ void PIUArchive::addFile(std::string fileName) throw(PIUArchiveException,
     if(fileSize < 0){
         std::ostringstream converter;
         converter << fileSize;
-        throw PIUArchiveException("Unexpected file size found. Filename: "+fileName+" | File size: "+converter.str());
+        throw UndefinedException("Unexpected file size found. Filename: "+fileName+" | File size: "+converter.str());
     }
 
 }

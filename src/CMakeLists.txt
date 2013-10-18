@@ -13,15 +13,9 @@ if(Boost_FOUND)
         include_directories(SYSTEM "/usr/include/c++/4.6/")
         message("Regenerating project for QtCreator")
     endif()
-    
-    #ADD_LIBRARY(piu STATIC fdhandler/fdhandler.c errors/errors.c piu/piu.c)
-    #ADD_LIBRARY(piushared SHARED fdhandler/fdhandler.c errors/errors.c piu/piu.c)
-    #ADD_EXECUTABLE(piuadd fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/add.c)
-    #ADD_EXECUTABLE(piudel fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/delete.c)  
+     
     ADD_EXECUTABLE(piuview fdhandler/fdhandler.cpp piu/piu.cpp cli-frontend/view.cpp)
     ADD_EXECUTABLE(devtest EXCLUDE_FROM_ALL fdhandler/fdhandler.cpp piu/piu.cpp devtests.cpp)
-    #ADD_EXECUTABLE(piuextract fdhandler/fdhandler.c errors/errors.c piu/piu.c frontend/extract.c)
-    #ADD_EXECUTABLE(check fdhandler/fdhandler.c errors/errors.c piu/piu.c tests/check_piu.c)
     
     target_link_libraries(devtest ${Boost_LIBRARIES})
     target_link_libraries(piuview ${Boost_LIBRARIES})

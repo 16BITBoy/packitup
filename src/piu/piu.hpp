@@ -35,54 +35,40 @@ public:
 /**
   \brief Exception base class.
 **/
-class PIUArchiveException{
-protected:
-    std::string msg;
-    std::string finalMsg;
+class UndefinedException : public std::runtime_error{
 public:
-    PIUArchiveException(std::string msg){
-        this->msg = msg;
-        buildMsg();
-    }
-    virtual void buildMsg(){
-        this->finalMsg = "Error: " + msg + "\n";
-    }
-
-    std::string errorMsg(){ return this->finalMsg; }
+    UndefinedException(std::string msg) :
+        std::runtime_error("Undefined PackItUp exception: " + msg) {}
 };
 
 
 /**
   \brief Exception: The PIU archive signature is invalid.
 **/
-class FileFormatError : public PIUArchiveException{
+class FileFormatError : public std::runtime_error{
 public:
-    FileFormatError(std::string msg) : PIUArchiveException(msg){}
-    void buildMsg(){
-        this->finalMsg = "File format error: " + msg + "\n";
-    }
+    FileFormatError(std::string msg) :
+        std::runtime_error("This is not a valid PIUArchive file: " + msg){}
+
 };
 
 /**
   \brief Exception: PIUArchive constructor called with empty string
 **/
-class BadParameter : public PIUArchiveException{
+class BadParameter : public std::runtime_error{
 public:
-    BadParameter(std::string msg) : PIUArchiveException(msg){}
-    void buildMsg(){
-        this->finalMsg = "Bad parameter value error: " + msg + "\n";
-    }
+    BadParameter(std::string msg) :
+        std::runtime_error("Bad parameter value error: " + msg){}
 };
 
 /**
   \brief Exception: The PIU archive doesn't exists.
 **/
-class FileNotFound : public PIUArchiveException{
+class FileNotFound : public std::runtime_error{
 public:
-    FileNotFound(std::string msg) : PIUArchiveException(msg){}
-    void buildMsg(){
-        this->finalMsg = "File not found : " + msg + "\n";
-    }
+    FileNotFound(std::string msg)
+        : std::runtime_error("File not found exception: " + msg){}
+
 };
 
 
@@ -113,7 +99,7 @@ private:
     boost::unordered::unordered_map<std::string, FileListSize> posMap; // Maps filenames with the position
                                                               // within the PIU archive.
     unsigned long int getFileOffset(int position); // Get file offset within PIU archive.
-    void getHeaderInfo() throw(PIUArchiveException,
+    void getHeaderInfo() throw(UndefinedException,
                                FileFormatError); // Gets header info from file on disk.
     void computeFileListSize();
 public:
@@ -124,7 +110,7 @@ public:
      * @post  If the file exist, loads the header information of the file. If it doesn't exists,
      *        this object remains empty and ready for use as a new PIU file.
      **/
-    PIUArchive(std::string fileName) throw(PIUArchiveException,
+    PIUArchive(std::string fileName) throw(UndefinedException,
                                            BadParameter);
     /**
      * \brief Returns a vector with the information about the files in the archive
@@ -146,7 +132,7 @@ public:
      *        was any, then deletes that old file and renames the temporary file to the name specified
      *        by fileName member.
      **/
-    void write() throw(PIUArchiveException,
+    void write() throw(UndefinedException,
                        FileNotFound);
     /**
      * \brief Adds a new file to the archive in memory (just adds the file information to the
@@ -156,7 +142,7 @@ public:
      * @post  If there is no problems during the read of the file, its information will be stored
      *        in memory for later be writen on disk when write() is called.
      **/
-    void addFile(std::string fileName) throw(PIUArchiveException,
+    void addFile(std::string fileName) throw(UndefinedException,
                                              FileNotFound,
                                              BadParameter);
     /**
@@ -170,7 +156,7 @@ public:
      *        if there is a problem with a particular file, either FileNotFound or PIUArchiveException is thrown when
      *        apropiate,
      */
-    void addDirectory(std::string dirPath) throw(PIUArchiveException,
+    void addDirectory(std::string dirPath) throw(UndefinedException,
                                                  FileNotFound,
                                                  BadParameter);
 
@@ -178,7 +164,7 @@ public:
     void deleteFile(std::string fileName);
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
     void extractFile(std::string fileName, std::string extractPath);
-    void updateHeaderInfo() throw(PIUArchiveException,
+    void updateHeaderInfo() throw(UndefinedException,
                                   FileFormatError);
 };
 } /* End of namespace PIU */

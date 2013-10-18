@@ -13,8 +13,8 @@ int main(int argc, char **argv){
         ar = new PIUArchive("test");
         ar->addFile("b");
     }
-    catch(PIUArchiveException e){
-        std::cout << e.errorMsg() << std::endl;
+    catch(UndefinedException e){
+        std::cout << e.what() << std::endl;
     }
 
 

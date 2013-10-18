@@ -12,7 +12,7 @@ void showPIUFileInformation(std::string file){
     try{
         ar = new PIUArchive(file);
     }
-    catch(PIUArchiveException &e){
+    catch(UndefinedException &e){
         std::cout << e.what() << std::endl;
     }
     std::vector<FileInfo> fileList = ar->listFiles();
