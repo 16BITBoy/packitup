@@ -66,7 +66,7 @@ void PIUArchive::getHeaderInfo() throw(UndefinedException,
         }
         bytesRead += fnl;
         *(tmpStr + fnl) = '\0';
-        fi.fileName = tmpStr;
+        fi.filePath = tmpStr;
         fi.fileSize = *(FileSize *)(buffer + bytesRead);
         bytesRead += sizeof(FileSize);
         this->headerInfo.fileList.push_back(fi);
@@ -74,7 +74,7 @@ void PIUArchive::getHeaderInfo() throw(UndefinedException,
         // in next version of this PIU archive, unless the opposite is explicitly specified.
         this->ops.filesKept.push_back(true);
         // Map the filename to the position this file will be kept in the fileList vector.
-        this->posMap[fi.fileName] = pos;
+        this->posMap[fi.filePath] = pos;
         ++pos;
     }
 }
@@ -130,9 +130,9 @@ void PIUArchive::write() throw(UndefinedException,
     fNew.append((char *)&this->headerInfo.fileListSize, sizeof(FileListSize));
     int i;
     for(i = 0; i < this->headerInfo.fileList.size(); i++){
-        FileNameLength fnl = this->headerInfo.fileList[i].fileName.length();
+        FileNameLength fnl = this->headerInfo.fileList[i].filePath.length();
         fNew.append((char *)&fnl, sizeof(FileNameLength));
-        fNew.append((char *)this->headerInfo.fileList[i].fileName.c_str(), this->headerInfo.fileList[i].fileName.length());
+        fNew.append((char *)this->headerInfo.fileList[i].filePath.c_str(), this->headerInfo.fileList[i].filePath.length());
         fNew.append((char *)&this->headerInfo.fileList[i].fileSize, sizeof(FileSize));
     }
 
@@ -199,7 +199,7 @@ void PIUArchive::computeFileListSize(){
     FileListSize totalSize = (sizeof(FileSize) + sizeof(FileNameLength)) * fileCount;
     int i;
     for(i = 0; i < this->headerInfo.fileList.size(); i++){
-        totalSize += this->headerInfo.fileList[i].fileName.length();
+        totalSize += this->headerInfo.fileList[i].filePath.length();
     }
     this->headerInfo.fileListSize = totalSize;
 }
@@ -211,9 +211,11 @@ std::vector<FileInfo> PIUArchive::listFiles(){
 FileListSize PIUArchive::getFileListSize(){
     return this->headerInfo.fileListSize;
 }
+
 /**
- * TODO: Store the gatered information in headerInfo. Don't forget to create
- * the needed entry in posMap.
+ * TODO: make better error handling and make it avoid adding
+ *       a file that is already present. If the user wants to update the file
+ *       it has first to delete the existing one.
  **/
 void PIUArchive::addFile(std::string fileName) throw(UndefinedException,
                                                      FileNotFound,
@@ -232,11 +234,14 @@ void PIUArchive::addFile(std::string fileName) throw(UndefinedException,
         throw FileNotFound("File \""+fileName+"\" not found.");
     }
 
-    if(fileSize < 0){
-        std::ostringstream converter;
-        converter << fileSize;
-        throw UndefinedException("Unexpected file size found. Filename: "+fileName+" | File size: "+converter.str());
-    }
+    FileInfo info;
+    info.filePath = fileName;
+    info.fileSize = fileSize;
+    this->headerInfo.fileList.push_back(info);
+
+    this->posMap[fileName] = this->headerInfo.fileList.size() - 1;
+    this->ops.newFiles.push_back(fileName);
+    computeFileListSize();
 
 }
 

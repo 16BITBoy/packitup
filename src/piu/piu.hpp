@@ -21,7 +21,7 @@ const std::string PIU_SIGNATURE = "PIU";
 class FileInfo{
 public:
     // PIU File format fields
-    std::string fileName;
+    std::string filePath;
     FileSize fileSize;
 };
 
@@ -147,7 +147,7 @@ public:
                                              BadParameter);
     /**
      * TODO: Very drafty spec. Review it.
-     * @brief addDirectory adds a new directory with all its files and subdirectories in it into the archive in memory
+     * @brief addDirectory adds a new directory with all its files and subdirectories in it, into the archive in memory
      *        (just adds the information of each element to the file header in memory)
      * @param dirPath Path to the directory
      * @pre   dirPath must not be empty. If so, BadParameter exception is thrown.
