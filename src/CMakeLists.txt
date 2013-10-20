@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(packitup CXX)
+project(src CXX)
 set(CMAKE_BUILD_TYPE Debug)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
@@ -14,10 +14,18 @@ if(Boost_FOUND)
         message("Regenerating project for QtCreator")
     endif()
      
-    ADD_EXECUTABLE(piuview fdhandler/fdhandler.cpp piu/piu.cpp cli-frontend/view.cpp)
-    ADD_EXECUTABLE(devtest EXCLUDE_FROM_ALL fdhandler/fdhandler.cpp piu/piu.cpp devtests.cpp)
+
+    ADD_LIBRARY(piu fdhandler/fdhandler.cpp piu/piu.cpp)
+
+    ADD_EXECUTABLE(piuview cli-frontend/view.cpp)
+    ADD_EXECUTABLE(devtest EXCLUDE_FROM_ALL devtests.cpp)
+
+    ADD_DEPENDENCIES(devtest piu)
+    ADD_DEPENDENCIES(piuview piu)
+
     
-    target_link_libraries(devtest ${Boost_LIBRARIES})
-    target_link_libraries(piuview ${Boost_LIBRARIES})
+    target_link_libraries(devtest ${Boost_LIBRARIES} piu)
+    target_link_libraries(piuview ${Boost_LIBRARIES} piu)
+    target_link_libraries(piu ${Boost_LIBRARIES})
 endif()
     
