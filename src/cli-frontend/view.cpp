@@ -20,7 +20,7 @@ void showPIUFileInformation(std::string file){
     std::cout << "File information read from PIU archive:" << std::endl;
     std::cout << "File list size: " << ar->getFileListSize() << std::endl;
     for(i = 0; i < fileList.size(); i++){
-        std::cout << fileList[i].fileName << " : "
+        std::cout << fileList[i].filePath << " : "
                   << fileList[i].fileSize << std::endl;
     }
 }
