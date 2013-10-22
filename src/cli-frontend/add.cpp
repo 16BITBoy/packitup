@@ -2,9 +2,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <boost/filesystem.hpp>
 
-#include "piu/piu.hpp"
+#include "../piu/piu.hpp"
 
 using namespace PIU;
 

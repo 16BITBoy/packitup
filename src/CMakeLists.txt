@@ -8,24 +8,29 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.49.0 COMPONENTS system filesystem)
 
 if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
+    include_directories(${Boost_INCLUDE_DIRS} piu fdhandler misc)
     if(QTCREATOR)
         include_directories(SYSTEM "/usr/include/c++/4.6/")
         message("Regenerating project for QtCreator")
     endif()
      
 
-    ADD_LIBRARY(piu fdhandler/fdhandler.cpp piu/piu.cpp)
+    ADD_LIBRARY(piu fdhandler/fdhandler.cpp piu/piu.cpp piu/piu_impl.cpp piu/operations.hpp piu/exceptions.hpp piu/fileformat.hpp fdhandler/fdhandler.hpp misc/pathutils.h)
 
     ADD_EXECUTABLE(piuview cli-frontend/view.cpp)
+    ADD_EXECUTABLE(piuadd cli-frontend/add.cpp)
     ADD_EXECUTABLE(devtest EXCLUDE_FROM_ALL devtests.cpp)
 
     ADD_DEPENDENCIES(devtest piu)
     ADD_DEPENDENCIES(piuview piu)
+    ADD_DEPENDENCIES(piuadd piu)
 
     
-    target_link_libraries(devtest ${Boost_LIBRARIES} piu)
-    target_link_libraries(piuview ${Boost_LIBRARIES} piu)
     target_link_libraries(piu ${Boost_LIBRARIES})
+    target_link_libraries(devtest ${Boost_LIBRARIES} piu)
+    target_link_libraries(piuview piu)
+    target_link_libraries(piuadd piu)
+
+
 endif()
     
