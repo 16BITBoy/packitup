@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
         poptions::notify(vm);
 
         if(vm.count("help")) {
+            std::cout << "Description: Prints the information about the files contained in the specified PackItUp package file." << std::endl;
+            std::cout << "Usage: "+std::string(argv[0])+" PACKAGE_FILE" << std::endl;
             std::cout << desc << std::endl;
             return EXIT_SUCCESS;
         }
@@ -53,7 +55,7 @@ int main(int argc, char **argv) {
         }
 
     }
-    catch(UndefinedException &e){
+    catch(std::runtime_error &e){
         std::cout << e.what() << std::endl;
         return EXIT_FAILURE;
     }

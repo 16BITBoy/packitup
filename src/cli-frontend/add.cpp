@@ -36,6 +36,8 @@ int main(int argc, char **argv){
         poptions::notify(vm);
 
         if(vm.count("help")) {
+            std::cout << "Description: Adds one or more files to the specified PackItUp package file." << std::endl;
+            std::cout << "Usage: "+std::string(argv[0])+" -p PACKAGE_FILE FILES..." << std::endl;
             std::cout << desc << std::endl;
             return EXIT_SUCCESS;
         }
@@ -73,7 +75,7 @@ int main(int argc, char **argv){
         ar->write();
         return EXIT_SUCCESS;
     }
-    catch(UndefinedException e){
+    catch(std::runtime_error &e){
         std::cout << e.what() << std::endl;
         return EXIT_FAILURE;
     }

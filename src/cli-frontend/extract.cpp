@@ -32,6 +32,10 @@ int main(int argc, char **argv){
         std::vector<std::string> files;
 
         if(vm.count("help")) {
+            std::cout << "Description: Extracts into the current directory, the specified files from the specified PackItUp package file" << std::endl;
+            std::cout << "Usage:" << std::endl;
+            std::cout << "Extract specific file: "+std::string(argv[0])+" -p PACKAGE_FILE FILES..." << std::endl;
+            std::cout << "Extract all files    : "+std::string(argv[0])+" -ap PACKAGE_FILE" << std::endl;
             std::cout << desc << std::endl;
             return EXIT_SUCCESS;
         }
@@ -73,7 +77,7 @@ int main(int argc, char **argv){
 
         return EXIT_SUCCESS;
     }
-    catch(UndefinedException e){
+    catch(std::runtime_error &e){
         std::cout << e.what() << std::endl;
         return EXIT_FAILURE;
     }
