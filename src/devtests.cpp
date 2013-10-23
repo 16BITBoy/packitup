@@ -21,12 +21,17 @@ int main(int argc, char **argv){
         }
         std::string package = argv[1];
         std::string file = argv[2];
+        boost::filesystem::path packagePath(argv[1]);
+        if(!boost::filesystem::exists(packagePath)) {
+            std::cerr << "Package file \""+package+"\" doesn't exist." << std::endl;
+            return EXIT_FAILURE;
+        }
         ar = new PIUArchive(package);
-        ar->add(file);
-        std::vector<FileInfo> files = ar->listFiles();
-        std::cout << "There are : " << files.size() << " files." << std::endl;
-        for_each(files.begin(), files.end(), printFileInfo);
-        ar->write();
+        if(!ar->exists(file)) {
+            std::cerr << "File \""+file+"\" doesn't exist inside the specified package file." << std::endl;
+            return EXIT_FAILURE;
+        }
+        ar->extractFile(file);
         return EXIT_SUCCESS;
     }
     catch(UndefinedException e){
