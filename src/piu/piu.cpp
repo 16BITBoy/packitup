@@ -60,5 +60,9 @@ bool PIUArchive::exists(std::string &fileName) {
     this->impl->exists(fileName);
 }
 
+void PIUArchive::extractFile(const std::string &fileName) throw (FileNotFound) {
+    this->impl->extractFile(fileName);
+}
+
 /** END DRAFT **/
 } // end namespace PIU
