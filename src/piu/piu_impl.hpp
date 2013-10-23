@@ -16,7 +16,7 @@
 namespace PIU{
 
 class PIUArchiveImpl{
-private: // It was private, before pimpling
+private:
     std::string fileName;
     PIUHeader headerInfo;
 
@@ -110,7 +110,7 @@ public:
     /** \brief Deletes a file from the archive in memory (just deletes the header information to the file in memory) **/
     void deleteFile(const std::string &fileName);
     /** \brief Reads the data from the file specified in the archive in memory and writes it into the specified path **/
-    void extractFile(const std::string &fileName, const std::string &extractPath);
+    void extractFile(const std::string &fileName) throw (FileNotFound);
     void updateHeaderInfo() throw(UndefinedException,
                                   FileFormatError);
     bool exists(const std::string &fileName);

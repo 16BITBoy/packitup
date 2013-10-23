@@ -321,6 +321,7 @@ boost::filesystem::path PIUArchiveImpl::makeRelativePath(boost::filesystem::path
             if(*pathIt == *baseIt) foundParent = true;
         }
     }
+
     boost::filesystem::path result;
     for(pathIt++; pathIt != path.end(); pathIt++) {
         boost::filesystem::path dir;
@@ -336,6 +337,29 @@ bool PIUArchiveImpl::exists(const std::string &fileName) {
         return false;
     } else {
         return true;
+    }
+}
+
+void PIUArchiveImpl::extractFile(const std::string &fileName) throw (FileNotFound) {
+    if(exists(fileName)) {
+        FileSize fileDataOffset = this->getFileOffset(this->posMap[fileName]);
+        FileSize fileDataSize = this->headerInfo.fileList[this->posMap[fileName]].fileSize;
+        FDHandler piuFile(this->fileName);
+        FDHandler fileToWrite(fileName);
+
+        boost::filesystem::path pathToExtract(fileName.c_str());
+        //std::cout << pathToExtract.parent_path().string() << std::endl;
+        if(!pathToExtract.parent_path().empty() &&
+           !boost::filesystem::exists(pathToExtract.parent_path())) {
+            boost::filesystem::create_directories(pathToExtract.parent_path());
+        }
+
+        Data buffer;
+        piuFile.readchk(&buffer, fileDataOffset, fileDataSize);
+        fileToWrite.write(&buffer);
+        //buffer.free();
+    } else {
+        throw FileNotFound("File \""+fileName+"\" does not exist in this package");
     }
 }
 
