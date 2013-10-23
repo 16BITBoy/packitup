@@ -2,10 +2,12 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <boost/program_options.hpp>
 
 #include "../piu/piu.hpp"
 
 using namespace PIU;
+namespace poptions = boost::program_options;
 
 // Shows all the information about the PIU file on screen
 void showPIUFileInformation(std::string file) throw (UndefinedException) {
@@ -24,13 +26,33 @@ void showPIUFileInformation(std::string file) throw (UndefinedException) {
 
 int main(int argc, char **argv) {
     try {
-        if(argc < 2){
-            std::cout << "File not specified. \n" << std::endl;
+        poptions::options_description desc("Program options");
+        desc.add_options()
+                ("help",                                      "Prints help information")
+                ("package,p", poptions::value<std::string>(), "Package file to view");
+
+        poptions::positional_options_description p;
+        p.add("package", -1);
+
+        poptions::variables_map vm;
+        poptions::store(poptions::command_line_parser(argc, argv).
+                  options(desc).positional(p).run(), vm);
+        poptions::notify(vm);
+
+        if(vm.count("help")) {
+            std::cout << desc << std::endl;
+            return EXIT_SUCCESS;
+        }
+
+        if(vm.count("package")) {
+            showPIUFileInformation(vm["package"].as<std::string>());
+            return EXIT_SUCCESS;
+        } else {
+            std::cerr << "No package file specified." << std::endl;
             return EXIT_FAILURE;
         }
-        showPIUFileInformation(std::string(argv[1]));
-        return EXIT_SUCCESS;
-        }
+
+    }
     catch(UndefinedException &e){
         std::cout << e.what() << std::endl;
         return EXIT_FAILURE;
